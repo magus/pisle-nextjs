@@ -3,7 +3,7 @@
 import * as React from 'react';
 import dynamic from 'next/dynamic';
 
-import Head from '~/components/Head';
+import CustomHead from '~/components/CustomHead';
 import Page from '~/components/Page';
 
 import spendGold from '~/src/algorithms/spendGold';
@@ -172,7 +172,7 @@ function DisplayUncommittedChange({
 const Home = () => {
   return (
     <Page>
-      <Head title="Home" />
+      <CustomHead title="Home" />
 
       <HabitatsState>
         {({ actions, basis, penguins, uncommittedChange }) => (
