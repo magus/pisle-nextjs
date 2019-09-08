@@ -5,6 +5,8 @@ import React from 'react';
 // Event handlers like onClick can't be added to this file
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
+import StyleReset from '~/components/StyleReset';
+import GlobalStyles from '~/components/GlobalStyles';
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: any) {
@@ -37,6 +39,8 @@ export default class MyDocument extends Document {
           />
 
           {/* Global Styles */}
+          <StyleReset />
+          <GlobalStyles />
         </Head>
 
         <body>
