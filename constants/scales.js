@@ -63,7 +63,11 @@ function shortToString(notation: ShortNotation): string {
   return `${value.toFixed(2)}${scaleString}`;
 }
 
-function fromNumber(value: number): string {
+function numberToShortString(value: number): string {
+  return shortToString(fromNumber(value));
+}
+
+function fromNumber(value: number): ShortNotation {
   const log10floor = Math.floor(Math.log10(value));
   let factor;
   for (let i = 0; i < FromFactorKeys.length; i++) {
@@ -78,16 +82,17 @@ function fromNumber(value: number): string {
   if (!factor && value >= 1000) throw new Error(`factor not found [${value}]`);
 
   // value smaller than smallest factor (a), return value itself
-  if (!factor) return value.toString();
+  if (!factor) return [value, undefined];
 
-  const factorMult = value / factorToNumber(+factor);
+  const factorMult = +(value / factorToNumber(+factor)).toFixed(2);
   const factorName = FromFactor[factor];
-  return `${factorMult}${factorName}`;
+  return [factorMult, factorName];
 }
 
 export default {
   Factors,
   fromNumber,
+  numberToShortString,
   shortToString,
   toNumber,
 };

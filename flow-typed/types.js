@@ -7,9 +7,9 @@ declare type HabitatTypes = $Keys<typeof habitats.Habitats>;
 declare type HabitatBasis = {|
   level: number,
   levelBasis: number,
-  gold: ShortNotation,
-  cost: ShortNotation,
-  hearts: ShortNotation,
+  gold: number,
+  cost: number,
+  hearts: number,
   multiplier: number,
 |};
 declare type HabitatBasisCollection = {

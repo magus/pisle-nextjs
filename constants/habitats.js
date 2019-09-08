@@ -1,7 +1,6 @@
 // @flow strict
 
 import game from '~/constants/game';
-import scales from '~/constants/scales';
 
 const Habitats = {
   FishingSpot: 'FishingSpot',
@@ -26,10 +25,9 @@ const All: HabitatTypes[] = Object.keys(Habitats);
 
 function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
   const habitatMeta = Metadata[habitat];
-  const hearts = scales.toNumber(basis.hearts);
+  const { hearts } = basis;
 
-  let gold = scales.toNumber(basis.gold);
-  let cost = scales.toNumber(basis.cost);
+  let { gold, cost } = basis;
 
   // estimate based on specified level using meta for basis
   if (basis.level !== basis.levelBasis) {
