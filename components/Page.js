@@ -2,6 +2,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import StyleReset from '~/components/StyleReset';
+import GlobalStyles from '~/components/GlobalStyles';
+
 function preventPullToRefresh(element) {
   if (!element) return;
 
@@ -43,7 +46,15 @@ export default class Page extends React.Component<Props> {
   }
 
   render() {
-    return <Container ref={this.containerRef}>{this.props.children}</Container>;
+    return (
+      <Container ref={this.containerRef}>
+        {/* Global Styles */}
+        <StyleReset />
+        <GlobalStyles />
+
+        {this.props.children}
+      </Container>
+    );
   }
 }
 
