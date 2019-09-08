@@ -1,10 +1,10 @@
 // @flow strict
 
 import * as React from 'react';
-import dynamic from 'next/dynamic';
 
 import CustomHead from '~/components/CustomHead';
 import Page from '~/components/Page';
+import HabitatsRows from '~/components/HabitatsRows';
 
 import spendGold from '~/src/algorithms/spendGold';
 import spendHearts from '~/src/algorithms/spendHearts';
@@ -13,10 +13,6 @@ import game from '~/constants/game';
 import { initHabitatBasisCollection } from '~/constants/test';
 import habitats from '~/constants/habitats';
 import scales from '~/constants/scales';
-
-const DynamicHabitatRows = dynamic(() => import('~/components/HabitatsRows'), {
-  ssr: false,
-});
 
 type Props = {|
   children: (props: RenderProps) => React.Node,
@@ -194,7 +190,7 @@ const Home = () => {
               onCancel={actions.setState(cancelChange())}
             />
 
-            <DynamicHabitatRows basis={basis} />
+            <HabitatsRows basis={basis} />
           </>
         )}
       </HabitatsState>
