@@ -91,43 +91,10 @@ function fromNumber(value: number): ShortNotation {
   return [factorMult, factorName];
 }
 
-const ShortNotationRegex = /^(\d+(\.\d+)?)\s*([a-z]{1})?$/;
-function validateShort(shortString: string): ?ShortNotation {
-  if (!shortString) return null;
-  const match = shortString.match(ShortNotationRegex);
-  if (!match) return null;
-
-  const value = parseFloat(match[1]);
-
-  if (isNaN(value)) return null;
-
-  const scale = match[3];
-
-  if (!scale) return [value, undefined];
-
-  return [value, scale];
-}
-
-const MultiplierRegex = /^(\d+)\s*%?$/;
-function validateMultiplier(multiplier: string): ?number {
-  if (!multiplier) return null;
-
-  const match = multiplier.match(MultiplierRegex);
-  if (!match) return null;
-
-  const value = parseFloat(match[1]);
-
-  if (isNaN(value) || value < 100) return null;
-
-  return value / 100;
-}
-
 export default {
   Factors,
   fromNumber,
   numberToShortString,
   shortToString,
   toNumber,
-  validateMultiplier,
-  validateShort,
 };

@@ -12,14 +12,11 @@ import HabitatEvolveStats from '~/components/HabitatRow/HabitatEvolveStats';
 import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
-import { initHabitatBasisCollection } from '~/constants/test';
 import habitats from '~/constants/habitats';
 import scales from '~/constants/scales';
 import Styles from '~/constants/styles';
 
-type Props = {|
-  children: (props: RenderProps) => React.Node,
-|};
+type Props = {||};
 
 const ChangeTypes = {
   Upgrade: 'Upgrade',
@@ -40,28 +37,37 @@ type EvolveUpdate = {
 
 type State = {|
   penguins: number,
-  basis: HabitatBasisCollection,
+  initBasis: {
+    [habitat: HabitatTypes]: {
+      level: string | number,
+      gold: string | number,
+      cost: string | number,
+      hearts: string | number,
+      multiplier: string | number,
+    },
+  },
+  basis: ?HabitatBasisCollection,
   uncommittedChange: ?Change,
 |};
 
-type RenderProps = {
-  ...State,
-  actions: {
-    setState: (action: any) => () => void,
-  },
-};
-
 const addPenguin = () => state => {
-  const penguins = state.penguins + 1;
-  // update all gold values for habitat basis
   const { basis } = state;
+
+  if (!basis) return;
+
+  const penguins = state.penguins + 1;
+
+  // update all gold values for habitat basis
   Object.keys(basis).forEach(habitat => {
     basis[habitat].gold = basis[habitat].gold * game.GoldIncreaseFactor;
   });
-  return { penguins, uncommittedChange: null };
+
+  return { basis, penguins, uncommittedChange: null };
 };
 
 const suggestUpgrades = budget => state => {
+  if (!state.basis) return;
+
   const meta = spendGold(budget, state.basis);
   const uncommittedChange = { type: ChangeTypes.Upgrade, meta };
   return { uncommittedChange };
@@ -79,6 +85,8 @@ const commitChange = change => state => {
   if (!change) return { uncommittedChange: null };
 
   const { basis } = state;
+
+  if (!basis) return;
 
   // build updated state based on change type
   switch (change.type) {
@@ -106,21 +114,260 @@ const commitChange = change => state => {
   return { uncommittedChange: null };
 };
 
-class HabitatsState extends React.Component<Props, State> {
-  state = {
-    penguins: 43,
-    basis: { ...initHabitatBasisCollection },
-    uncommittedChange: null,
+const setBasis = (habitat, updateBlob) => state => {
+  const { initBasis } = state;
+  initBasis[habitat] = { ...initBasis[habitat], ...updateBlob };
+  return { initBasis };
+};
+
+const LocalStorageKey = 'pisle-nextjs';
+const InitBasisPlaceholders = {
+  level: '42',
+  gold: '23.81g',
+  cost: '376.98g',
+  hearts: '1.00 c',
+  multiplier: '300%',
+};
+
+type InputProps = {
+  onChange: (value: string) => void,
+  placeholder: string,
+  transform: (value: string) => any,
+  validate: (value: string) => boolean,
+  value: string | number,
+};
+
+type InputState = {
+  value: string,
+};
+
+class Input extends React.Component<InputProps, InputState> {
+  static defaultProps = {
+    transform: value => value,
   };
 
+  state = { value: `${this.props.value}` || '' };
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const isPropSameAsState = nextProps.value === this.state.value;
+    const isStateUnchanged = nextState.value === this.state.value;
+    if (isPropSameAsState && isStateUnchanged) {
+      return false;
+    }
+
+    return true;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { validate, onChange, transform } = this.props;
+    const { value } = this.state;
+
+    const stateChanged = prevState.value !== value;
+
+    if (stateChanged && validate(value) && onChange) {
+      onChange(transform(value));
+    }
+  }
+
   render() {
-    return this.props.children({
-      ...this.state,
-      actions: {
-        setState: action => () => this.setState(action),
-      },
+    const { validate, placeholder } = this.props;
+    const { value } = this.state;
+
+    return (
+      <StyledInput
+        invalid={value && !validate(value)}
+        onChange={event => this.setState({ value: event.target.value })}
+        value={value}
+        placeholder={placeholder}
+      />
+    );
+  }
+}
+
+const StyledInput = styled.input`
+  border: 1px solid ${props => (props.invalid ? 'red' : 'inherit')};
+`;
+
+class HabitatsState extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      penguins: 43,
+      initBasis: {},
+      basis: null,
+      uncommittedChange: null,
+    };
+  }
+
+  componentDidMount() {
+    if (window && window.localStorage) {
+      const storedState = JSON.parse(
+        window.localStorage.getItem(LocalStorageKey)
+      );
+      if (storedState && storedState.basis) {
+        this.setState({ basis: storedState.basis });
+      } else if (storedState && storedState.initBasis) {
+        this.setState({ initBasis: storedState.initBasis });
+      }
+    }
+  }
+
+  componentDidUpdate() {
+    console.info('localStorage', 'write', { ...this.state });
+    localStorage.setItem(LocalStorageKey, JSON.stringify(this.state));
+  }
+
+  _getInputs() {
+    const basis = {};
+    let valid = true;
+
+    // build basis from initBasis, validating along the way
+    // if a field is set it was validated and transformed already
+    const { initBasis } = this.state;
+    Object.keys(initBasis).forEach(habitat => {
+      const habitatInitBasis = initBasis[habitat];
+      // {
+      //   level: '',
+      //   gold: '',
+      //   cost: '',
+      //   hearts: '',
+      //   multiplier: '',
+      // }
     });
   }
+
+  render() {
+    const { basis, penguins, uncommittedChange } = this.state;
+
+    if (!basis) {
+      const input = this._getInputs();
+
+      return (
+        <>
+          <Instructions>
+            {"Welcome, you look new here. Let's get you setup!"}
+          </Instructions>
+          {this._renderInitBasis()}
+          {this._renderReset()}
+        </>
+      );
+    }
+
+    return (
+      <>
+        <button onClick={() => this.setState(suggestUpgrades([10, 'k']))}>
+          Upgrade
+        </button>
+        <button onClick={() => this.setState(suggestEvolve())}>Evolve</button>
+
+        <div>Penguins</div>
+        <div>{penguins}</div>
+        <button onClick={() => this.setState(addPenguin())}>+</button>
+
+        {!uncommittedChange ? null : (
+          <DisplayUncommittedChange
+            change={uncommittedChange}
+            onDone={extra => () =>
+              this.setState(commitChange({ ...uncommittedChange, extra }))}
+            onCancel={() => this.setState(cancelChange())}
+          />
+        )}
+
+        {habitats.All.map<any>(habitat => {
+          const habitatBasis = basis[habitat];
+          if (habitatBasis) {
+            return (
+              <HabitatRow
+                key={habitat}
+                habitat={habitat}
+                onClick={habitat => {
+                  console.info('clicked', habitat);
+                }}
+              >
+                <HabitatContentStats habitat={habitat} basis={habitatBasis} />
+              </HabitatRow>
+            );
+          }
+          return (
+            <HabitatRow
+              key={habitat}
+              habitat={habitat}
+              onClick={habitat => {
+                console.info('clicked', habitat);
+              }}
+            >
+              Not Unlocked
+            </HabitatRow>
+          );
+        })}
+
+        {this._renderReset()}
+      </>
+    );
+  }
+
+  _renderReset() {
+    return (
+      <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
+        Reset
+      </button>
+    );
+  }
+
+  _renderInitBasis = () => {
+    const { initBasis } = this.state;
+    return habitats.All.map<any>(habitat => {
+      const initBasisHabitat = initBasis[habitat];
+
+      if (!initBasisHabitat) {
+        return (
+          <HabitatRow
+            key={habitat}
+            habitat={habitat}
+            onClick={habitat => {
+              this.setState(
+                setBasis(habitat, {
+                  level: '',
+                  gold: '',
+                  cost: '',
+                  hearts: '',
+                  multiplier: '',
+                })
+              );
+            }}
+          >
+            Click to unlock
+          </HabitatRow>
+        );
+      }
+
+      return (
+        <HabitatRow
+          key={habitat}
+          habitat={habitat}
+          onClick={habitat => {
+            console.info('clicked', habitat);
+          }}
+        >
+          {Object.keys(initBasis[habitat]).map(field => {
+            return (
+              <Input
+                key={`${habitat}-${field}`}
+                onChange={value =>
+                  this.setState(setBasis(habitat, { [field]: value }))
+                }
+                placeholder={InitBasisPlaceholders[field]}
+                transform={value => habitats.ValidateField[field](value)}
+                validate={value => !!habitats.ValidateField[field](value)}
+                value={initBasis[habitat][field]}
+              />
+            );
+          })}
+        </HabitatRow>
+      );
+    });
+  };
 }
 
 type ChangeProps = {|
@@ -143,8 +390,8 @@ class EvolveChange extends React.Component<ChangeProps, EvolveChangeState> {
   };
 
   _getInputs() {
-    const hearts = scales.toNumber(scales.validateShort(this.state.hearts));
-    const multiplier = scales.validateMultiplier(this.state.multiplier);
+    const hearts = habitats.ValidateField.hearts(this.state.hearts);
+    const multiplier = habitats.ValidateField.multiplier(this.state.multiplier);
     return {
       valid: !!(hearts && multiplier),
       hearts,
@@ -269,55 +516,13 @@ function DisplayUncommittedChange({ change, onCancel, onDone }: ChangeProps) {
 }
 
 const Home = () => {
-  console.info('spendGold', spendGold([2, 'k'], initHabitatBasisCollection));
+  // console.info('spendGold', spendGold([2, 'l'], initHabitatBasisCollection));
 
   return (
     <Page>
       <CustomHead title="Home" />
 
-      <HabitatsState>
-        {({ actions, basis, penguins, uncommittedChange }) => (
-          <>
-            <button onClick={actions.setState(suggestUpgrades([10, 'k']))}>
-              Upgrade
-            </button>
-            <button onClick={actions.setState(suggestEvolve())}>Evolve</button>
-
-            <div>Penguins</div>
-            <div>{penguins}</div>
-            <button onClick={actions.setState(addPenguin())}>+</button>
-
-            {!uncommittedChange ? null : (
-              <DisplayUncommittedChange
-                change={uncommittedChange}
-                onDone={extra =>
-                  actions.setState(
-                    commitChange({ ...uncommittedChange, extra })
-                  )
-                }
-                onCancel={actions.setState(cancelChange())}
-              />
-            )}
-
-            {habitats.All.map<any>(habitat => {
-              return (
-                <HabitatRow
-                  key={habitat}
-                  habitat={habitat}
-                  onClick={habitat => {
-                    console.info('clicked', habitat);
-                  }}
-                >
-                  <HabitatContentStats
-                    habitat={habitat}
-                    basis={basis[habitat]}
-                  />
-                </HabitatRow>
-              );
-            })}
-          </>
-        )}
-      </HabitatsState>
+      <HabitatsState />
     </Page>
   );
 };

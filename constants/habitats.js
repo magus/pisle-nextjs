@@ -1,5 +1,7 @@
 // @flow strict
 
+import scales from '~/constants/scales';
+
 const Habitats = {
   FishingSpot: 'FishingSpot',
   FlowerGarden: 'FlowerGarden',
@@ -71,9 +73,66 @@ const Metadata = {
   },
 };
 
+const ShortNotationRegex = /^(\d+(\.\d+)?)\s*([a-z]{1})?$/;
+
+function validateShort(shortString: string): ?number {
+  if (!shortString) return null;
+  const match = shortString.match(ShortNotationRegex);
+  if (!match) return null;
+
+  const value = parseFloat(match[1]);
+
+  if (isNaN(value)) return null;
+
+  const scale = match[3];
+
+  if (!scale) return scales.toNumber([value, undefined]);
+
+  return scales.toNumber([value, scale]);
+}
+
+const MultiplierRegex = /^(\d+)\s*%?$/;
+
+function validateMultiplier(multiplier: string): ?number {
+  if (!multiplier) return null;
+
+  const match = multiplier.match(MultiplierRegex);
+  if (!match) return null;
+
+  const value = parseFloat(match[1]);
+
+  if (isNaN(value) || value < 100) return null;
+
+  return value / 100;
+}
+
+const LevelRegex = /^[0-9]+$/;
+
+function validateLevel(level: string): ?number {
+  if (!level) return null;
+
+  const match = level.match(LevelRegex);
+  if (!match) return null;
+
+  const value = parseInt(match[0], 10);
+
+  if (isNaN(value) || value < 1) return null;
+
+  return value;
+}
+
+const ValidateField = {
+  level: validateLevel,
+  gold: validateShort,
+  cost: validateShort,
+  hearts: validateShort,
+  multiplier: validateMultiplier,
+};
+
 export default {
   ...Habitats,
   All,
+  ValidateField,
   Habitats,
   Metadata,
   getMetadata,
