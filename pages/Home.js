@@ -14,6 +14,7 @@ import spendGold from '~/src/algorithms/spendGold';
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
 import Styles from '~/constants/styles';
+import colors from '../constants/styles/colors';
 
 type Props = {||};
 
@@ -151,7 +152,8 @@ class Input extends React.Component<InputProps> {
 }
 
 const StyledInput = styled.input`
-  border: 1px solid ${props => (props.invalid ? 'red' : 'inherit')};
+  border: 1px solid
+    ${props => (props.invalid ? Styles.Colors.Orange : Styles.Colors.Gray)};
 `;
 
 class HabitatsState extends React.Component<Props, State> {
@@ -171,10 +173,21 @@ class HabitatsState extends React.Component<Props, State> {
       const storedState = JSON.parse(
         window.localStorage.getItem(LocalStorageKey)
       );
-      if (storedState && storedState.basis) {
-        this.setState({ basis: storedState.basis });
-      } else if (storedState && storedState.initBasis) {
-        this.setState({ initBasis: storedState.initBasis });
+
+      if (storedState) {
+        const state = {};
+
+        if (storedState.basis) {
+          state.basis = storedState.basis;
+        }
+        if (storedState.initBasis) {
+          state.initBasis = storedState.initBasis;
+        }
+        if (storedState.penguins) {
+          state.penguins = storedState.penguins;
+        }
+
+        this.setState(state);
       }
     }
   }
@@ -416,15 +429,17 @@ class EvolveChange extends React.Component<ChangeProps, EvolveChangeState> {
 
     return (
       <>
-        <input
-          onChange={event => this.setState({ hearts: event.target.value })}
+        <Input
+          onChange={hearts => this.setState({ hearts })}
+          placeholder={InitBasisPlaceholders.hearts}
+          validate={value => !!habitats.ValidateField.hearts(value)}
           value={hearts}
-          placeholder="1.00c"
         />
-        <input
-          onChange={event => this.setState({ multiplier: event.target.value })}
+        <Input
+          onChange={multiplier => this.setState({ multiplier })}
+          placeholder={InitBasisPlaceholders.multiplier}
+          validate={value => !!habitats.ValidateField.multiplier(value)}
           value={multiplier}
-          placeholder="300%"
         />
       </>
     );
