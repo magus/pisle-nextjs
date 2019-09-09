@@ -4,10 +4,11 @@ import * as React from 'react';
 
 import CustomHead from '~/components/CustomHead';
 import Page from '~/components/Page';
-import HabitatsRows from '~/components/HabitatsRows';
+import HabitatRow from '~/components/HabitatRow';
+import HabitatContentStats from '~/components/HabitatRow/HabitatContentStats';
+import HabitatEvolveStats from '~/components/HabitatRow/HabitatEvolveStats';
 
 import spendGold from '~/src/algorithms/spendGold';
-import spendHearts from '~/src/algorithms/spendHearts';
 
 import game from '~/constants/game';
 import { initHabitatBasisCollection } from '~/constants/test';
@@ -64,7 +65,7 @@ const suggestUpgrades = budget => state => {
 };
 
 const suggestEvolve = () => state => {
-  const meta = spendHearts(state.basis);
+  const meta = state.basis;
   const uncommittedChange = { type: ChangeTypes.Evolve, meta };
   return { uncommittedChange };
 };
@@ -114,6 +115,48 @@ class HabitatsState extends React.Component<Props, State> {
   }
 }
 
+class EvolveChange extends React.Component {
+  state = { valid: false };
+
+  render() {
+    const { change, onDone, onCancel } = this.props;
+
+    console.info('meta', change.meta);
+
+    return (
+      <>
+        <div>Which habitat do you want to evolve?</div>
+        {Object.keys(change.meta).map(habitat => {
+          return (
+            <HabitatRow
+              key={habitat}
+              habitat={habitat}
+              onClick={habitat => console.info('clicked', habitat)}
+            >
+              <HabitatEvolveStats
+                habitat={habitat}
+                basis={change.meta[habitat]}
+              />
+            </HabitatRow>
+          );
+        })}
+
+        <pre>{JSON.stringify(change, null, 2)}</pre>
+        <button
+          onClick={onDone({
+            habitat: habitats.FishingSpot,
+            multipler: 2500,
+            hearts: scales.toNumber([100, 'd']),
+          })}
+        >
+          Done
+        </button>
+        <button onClick={onCancel}>Cancel</button>
+      </>
+    );
+  }
+}
+
 function DisplayUncommittedChange({
   change,
   onCancel,
@@ -141,22 +184,7 @@ function DisplayUncommittedChange({
     case ChangeTypes.Evolve: {
       console.info('DisplayUncommittedChange', ChangeTypes.Evolve, change);
       return (
-        <>
-          <div>
-            Make the following changes in your game, then click Done below
-          </div>
-          <pre>{JSON.stringify(change, null, 2)}</pre>
-          <button
-            onClick={onDone({
-              habitat: habitats.FishingSpot,
-              multipler: 2500,
-              hearts: scales.toNumber([100, 'd']),
-            })}
-          >
-            Done
-          </button>
-          <button onClick={onCancel}>Cancel</button>
-        </>
+        <EvolveChange change={change} onDone={onDone} onCancel={onCancel} />
       );
     }
     default:
@@ -166,6 +194,8 @@ function DisplayUncommittedChange({
 }
 
 const Home = () => {
+  console.info('spendGold', spendGold([2, 'k'], initHabitatBasisCollection));
+
   return (
     <Page>
       <CustomHead title="Home" />
@@ -190,7 +220,20 @@ const Home = () => {
               onCancel={actions.setState(cancelChange())}
             />
 
-            <HabitatsRows basis={basis} />
+            {habitats.All.map<any>(habitat => {
+              return (
+                <HabitatRow
+                  key={habitat}
+                  habitat={habitat}
+                  onClick={habitat => console.info('clicked', habitat)}
+                >
+                  <HabitatContentStats
+                    habitat={habitat}
+                    basis={basis[habitat]}
+                  />
+                </HabitatRow>
+              );
+            })}
           </>
         )}
       </HabitatsState>

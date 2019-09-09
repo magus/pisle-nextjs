@@ -25,17 +25,9 @@ const All: HabitatTypes[] = Object.keys(Habitats);
 
 function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
   const habitatMeta = Metadata[habitat];
-  const { hearts } = basis;
+  const { cost, gold, hearts } = basis;
 
-  let { gold, cost } = basis;
-
-  // estimate based on specified level using meta for basis
-  if (basis.level !== basis.levelBasis) {
-    const levelDelta = basis.level - basis.levelBasis;
-    gold = gold * Math.pow(game.GoldIncreaseFactor, levelDelta);
-    cost = cost * Math.pow(game.CostIncreaseFactor, levelDelta);
-  }
-
+  const goldIncrease = gold - basis.gold;
   const goldPerSecond = gold / habitatMeta.rate;
   const goldPerSecondPerCost = goldPerSecond / cost;
   const goldPerSecondPerHeart = (goldPerSecond * basis.multiplier) / hearts;
@@ -43,6 +35,7 @@ function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
   return {
     habitat,
     cost,
+    goldIncrease,
     goldPerSecond,
     goldPerSecondPerCost,
     goldPerSecondPerHeart,
@@ -74,7 +67,7 @@ const Metadata = {
   },
   [Habitats.SeagullNest]: {
     name: 'Seagull Nest',
-    rate: 7,
+    rate: 10,
   },
   [Habitats.AmusementPark]: {
     name: 'Amusement Park',

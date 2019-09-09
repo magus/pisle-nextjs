@@ -6,7 +6,6 @@ import scales from '~/constants/scales';
 declare type HabitatTypes = $Keys<typeof habitats.Habitats>;
 declare type HabitatBasis = {|
   level: number,
-  levelBasis: number,
   gold: number,
   cost: number,
   hearts: number,
