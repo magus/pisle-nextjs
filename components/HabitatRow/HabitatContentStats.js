@@ -3,7 +3,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { HabitatContentRow } from '~/components/HabitatRow';
+import {
+  HabitatGoldPerSecond,
+  HabitatContentRow,
+  HabitatLabeledValue,
+} from '~/components/HabitatRow';
 
 import Styles from '~/constants/styles';
 import habitats from '~/constants/habitats';
@@ -17,15 +21,33 @@ function HabitatContentStats({
   basis: HabitatBasis,
 }) {
   const { rate } = habitats.Metadata[habitat];
-  const basisString = scales.numberToShortString(basis.gold);
+  const meta = habitats.getMetadata(habitat, basis);
+
+  const oldGold = scales.numberToShortString(basis.gold);
+  const goldPerSecond = scales.numberToShortString(meta.goldPerSecond);
 
   return (
     <>
       <HabitatContentRow>
-        <HabitatRate>{`${basisString} / ${rate}Sec`}</HabitatRate>
+        <HabitatRate>
+          <span>{`${oldGold} / ${rate}Sec`}</span>
+        </HabitatRate>
+        <HabitatGoldPerSecond>
+          <span>{`${goldPerSecond} / Sec`}</span>
+        </HabitatGoldPerSecond>
       </HabitatContentRow>
       <HabitatContentRow>
-        <pre>{JSON.stringify(basis, null, 2)}</pre>
+        <HabitatLabeledValue label="LV" value={`${basis.level}`} />
+        <HabitatLabeledValue
+          label="Cost"
+          value={scales.numberToShortString(basis.cost)}
+        />
+        <HabitatLabeledValue
+          label="❤️"
+          value={`${scales.numberToShortString(
+            basis.hearts
+          )} (${basis.multiplier * 100}%)`}
+        />
       </HabitatContentRow>
     </>
   );

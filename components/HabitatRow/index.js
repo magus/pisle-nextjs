@@ -38,7 +38,7 @@ const HabitatContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  margin: ${Styles.Spacing.Medium}px;
+  margin: ${Styles.Spacing.Large}px;
   padding: 16px;
   border-radius: ${Styles.Radius.Normal}px;
   box-shadow: 0px 0px ${Styles.Radius.Normal}px 0px ${Styles.Colors.Shadow};
@@ -92,4 +92,39 @@ export const HabitatGoldPerSecond = styled.div`
   font-size: ${Styles.Fonts.Smaller}px;
   font-weight: ${Styles.Fonts.Weight.Normal};
   color: ${Styles.Colors.Gold};
+`;
+
+export const HabitatLabeledValue = ({
+  value,
+  label,
+}: {
+  value: string,
+  label: string,
+}) => {
+  return (
+    <HabitatLabeledValueContainer>
+      <HabitatLabeledValueLabel>{label}</HabitatLabeledValueLabel>
+      <HabitatLabeledValueValue>{value}</HabitatLabeledValueValue>
+    </HabitatLabeledValueContainer>
+  );
+};
+
+const HabitatLabeledValueContainer = styled.div`
+  margin: ${Styles.Spacing.Smaller}px 0 0 0;
+  font-size: ${Styles.Fonts.Smaller}px;
+  font-weight: ${Styles.Fonts.Weight.Normal};
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+`;
+
+const HabitatLabeledValueLabel = styled.div`
+  color: ${Styles.Colors.Red};
+  font-weight: ${Styles.Fonts.Weight.Heavy};
+`;
+
+const HabitatLabeledValueValue = styled.div`
+  padding: 0 0 0 ${Styles.Spacing.Small}px;
+  color: ${Styles.Colors.GrayDarker};
+  font-size: ${Styles.Fonts.Medium}px;
 `;

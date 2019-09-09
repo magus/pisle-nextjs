@@ -6,5 +6,7 @@ export default {
   Gray: '#e5e5e5',
   GrayDarker: '#8e8e92',
   Orange: '#f15a24',
+  Red: '#ea6071',
   Shadow: 'rgba(0, 0, 0, 0.2)',
+  White: '#feffff',
 };

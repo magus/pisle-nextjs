@@ -4,6 +4,7 @@ import Styles from '~/constants/styles';
 
 export default createGlobalStyle`
   body {
+    background: ${Styles.Colors.White};
     font-size: ${Styles.Fonts.Medium}px;
     font-weight: ${Styles.Fonts.Weight.Normal};
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
