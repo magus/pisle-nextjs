@@ -264,6 +264,7 @@ class HabitatsState extends React.Component<Props, State> {
     return (
       <>
         <Input
+          label="Budget"
           onChange={upgradeBudget => this.setState({ upgradeBudget })}
           placeholder={InitBasisPlaceholders.cost}
           validate={value => !!habitats.ValidateField.cost(value)}
@@ -461,12 +462,14 @@ class EvolveChange extends React.Component<ChangeProps, EvolveChangeState> {
     return (
       <>
         <Input
+          label="❤️"
           onChange={hearts => this.setState({ hearts })}
           placeholder={InitBasisPlaceholders.hearts}
           validate={value => !!habitats.ValidateField.hearts(value)}
           value={hearts}
         />
         <Input
+          label="Multipler %"
           onChange={multiplier => this.setState({ multiplier })}
           placeholder={InitBasisPlaceholders.multiplier}
           validate={value => !!habitats.ValidateField.multiplier(value)}
