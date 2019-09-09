@@ -103,6 +103,9 @@ const commitChange = change => state => {
       if (change.extra) {
         const { habitat, hearts, multiplier } = change.extra;
         basis[habitat].hearts = hearts;
+        // Update gold based on old multiplier first
+        basis[habitat].gold = basis[habitat].gold * basis[habitat].multiplier;
+        // Now set new multiplier
         basis[habitat].multiplier = multiplier;
       }
       break;
