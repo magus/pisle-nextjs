@@ -76,7 +76,8 @@ const Metadata = {
 const ShortNotationRegex = /^(\d+(\.\d+)?)\s*([a-z]{1})?$/;
 
 function validateShort(shortString: string): ?number {
-  if (!shortString) return null;
+  if (typeof shortString !== 'string') return null;
+
   const match = shortString.match(ShortNotationRegex);
   if (!match) return null;
 
@@ -94,7 +95,7 @@ function validateShort(shortString: string): ?number {
 const MultiplierRegex = /^(\d+)\s*%?$/;
 
 function validateMultiplier(multiplier: string): ?number {
-  if (!multiplier) return null;
+  if (typeof multiplier !== 'string') return null;
 
   const match = multiplier.match(MultiplierRegex);
   if (!match) return null;
@@ -109,7 +110,7 @@ function validateMultiplier(multiplier: string): ?number {
 const LevelRegex = /^[0-9]+$/;
 
 function validateLevel(level: string): ?number {
-  if (!level) return null;
+  if (typeof level !== 'string') return null;
 
   const match = level.match(LevelRegex);
   if (!match) return null;

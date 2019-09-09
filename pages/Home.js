@@ -13,7 +13,6 @@ import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
-import scales from '~/constants/scales';
 import Styles from '~/constants/styles';
 
 type Props = {||};
@@ -39,11 +38,11 @@ type State = {|
   penguins: number,
   initBasis: {
     [habitat: HabitatTypes]: {
-      level: string | number,
-      gold: string | number,
-      cost: string | number,
-      hearts: string | number,
-      multiplier: string | number,
+      level: string,
+      gold: string,
+      cost: string,
+      hearts: string,
+      multiplier: string,
     },
   },
   basis: ?HabitatBasisCollection,
@@ -114,7 +113,7 @@ const commitChange = change => state => {
   return { uncommittedChange: null };
 };
 
-const setBasis = (habitat, updateBlob) => state => {
+const setInitBasis = (habitat, updateBlob) => state => {
   const { initBasis } = state;
   initBasis[habitat] = { ...initBasis[habitat], ...updateBlob };
   return { initBasis };
@@ -132,51 +131,18 @@ const InitBasisPlaceholders = {
 type InputProps = {
   onChange: (value: string) => void,
   placeholder: string,
-  transform: (value: string) => any,
   validate: (value: string) => boolean,
-  value: string | number,
-};
-
-type InputState = {
   value: string,
 };
 
-class Input extends React.Component<InputProps, InputState> {
-  static defaultProps = {
-    transform: value => value,
-  };
-
-  state = { value: `${this.props.value}` || '' };
-
-  shouldComponentUpdate(nextProps, nextState) {
-    const isPropSameAsState = nextProps.value === this.state.value;
-    const isStateUnchanged = nextState.value === this.state.value;
-    if (isPropSameAsState && isStateUnchanged) {
-      return false;
-    }
-
-    return true;
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { validate, onChange, transform } = this.props;
-    const { value } = this.state;
-
-    const stateChanged = prevState.value !== value;
-
-    if (stateChanged && validate(value) && onChange) {
-      onChange(transform(value));
-    }
-  }
-
+class Input extends React.Component<InputProps> {
   render() {
-    const { validate, placeholder } = this.props;
-    const { value } = this.state;
+    const { validate, value, onChange, placeholder } = this.props;
 
     return (
       <StyledInput
         invalid={value && !validate(value)}
-        onChange={event => this.setState({ value: event.target.value })}
+        onChange={event => onChange(event.target.value)}
         value={value}
         placeholder={placeholder}
       />
@@ -227,22 +193,23 @@ class HabitatsState extends React.Component<Props, State> {
     const { initBasis } = this.state;
     Object.keys(initBasis).forEach(habitat => {
       const habitatInitBasis = initBasis[habitat];
-      // {
-      //   level: '',
-      //   gold: '',
-      //   cost: '',
-      //   hearts: '',
-      //   multiplier: '',
-      // }
+
+      basis[habitat] = {};
+      Object.keys(habitatInitBasis).forEach(field => {
+        const fieldInput = habitatInitBasis[field];
+        const validatedValue = habitats.ValidateField[field](fieldInput);
+        if (!validatedValue) valid = false;
+        basis[habitat][field] = validatedValue;
+      });
     });
+
+    return valid && basis;
   }
 
   render() {
     const { basis, penguins, uncommittedChange } = this.state;
 
     if (!basis) {
-      const input = this._getInputs();
-
       return (
         <>
           <Instructions>
@@ -250,6 +217,7 @@ class HabitatsState extends React.Component<Props, State> {
           </Instructions>
           {this._renderInitBasis()}
           {this._renderReset()}
+          {this._renderSave()}
         </>
       );
     }
@@ -315,6 +283,16 @@ class HabitatsState extends React.Component<Props, State> {
     );
   }
 
+  _renderSave() {
+    const basis = this._getInputs();
+
+    return (
+      <button disabled={!basis} onClick={() => this.setState({ basis })}>
+        Save
+      </button>
+    );
+  }
+
   _renderInitBasis = () => {
     const { initBasis } = this.state;
     return habitats.All.map<any>(habitat => {
@@ -327,7 +305,7 @@ class HabitatsState extends React.Component<Props, State> {
             habitat={habitat}
             onClick={habitat => {
               this.setState(
-                setBasis(habitat, {
+                setInitBasis(habitat, {
                   level: '',
                   gold: '',
                   cost: '',
@@ -355,10 +333,9 @@ class HabitatsState extends React.Component<Props, State> {
               <Input
                 key={`${habitat}-${field}`}
                 onChange={value =>
-                  this.setState(setBasis(habitat, { [field]: value }))
+                  this.setState(setInitBasis(habitat, { [field]: value }))
                 }
                 placeholder={InitBasisPlaceholders[field]}
-                transform={value => habitats.ValidateField[field](value)}
                 validate={value => !!habitats.ValidateField[field](value)}
                 value={initBasis[habitat][field]}
               />
