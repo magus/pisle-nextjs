@@ -131,6 +131,7 @@ const InitBasisPlaceholders = {
 };
 
 type InputProps = {
+  label: string,
   onChange: (value: string) => void,
   placeholder: string,
   validate: (value: string) => boolean,
@@ -139,15 +140,18 @@ type InputProps = {
 
 class Input extends React.Component<InputProps> {
   render() {
-    const { validate, value, onChange, placeholder } = this.props;
+    const { label, validate, value, onChange, placeholder } = this.props;
 
     return (
-      <StyledInput
-        invalid={value && !validate(value)}
-        onChange={event => onChange(event.target.value)}
-        value={value}
-        placeholder={placeholder}
-      />
+      <label>
+        <InputLabel>{label}</InputLabel>
+        <StyledInput
+          invalid={value && !validate(value)}
+          onChange={event => onChange(event.target.value)}
+          value={value}
+          placeholder={placeholder}
+        />
+      </label>
     );
   }
 }
@@ -155,6 +159,10 @@ class Input extends React.Component<InputProps> {
 const StyledInput = styled.input`
   border: 1px solid
     ${props => (props.invalid ? Styles.Colors.Orange : Styles.Colors.Gray)};
+`;
+
+const InputLabel = styled.span`
+  margin: 0 ${Styles.Spacing.Small}px 0 0;
 `;
 
 class HabitatsState extends React.Component<Props, State> {
@@ -363,10 +371,11 @@ class HabitatsState extends React.Component<Props, State> {
             console.info('clicked', habitat);
           }}
         >
-          {Object.keys(initBasis[habitat]).map(field => {
+          {['level', 'gold', 'cost', 'hearts', 'multiplier'].map(field => {
             return (
               <Input
                 key={`${habitat}-${field}`}
+                label={field}
                 onChange={value =>
                   this.setState(setInitBasis(habitat, { [field]: value }))
                 }
