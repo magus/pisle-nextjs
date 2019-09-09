@@ -47,6 +47,7 @@ type State = {|
   },
   basis: ?HabitatBasisCollection,
   uncommittedChange: ?Change,
+  upgradeBudget: string,
 |};
 
 const addPenguin = () => state => {
@@ -65,7 +66,7 @@ const addPenguin = () => state => {
 };
 
 const suggestUpgrades = budget => state => {
-  if (!state.basis) return;
+  if (!state.basis || !budget) return;
 
   const meta = spendGold(budget, state.basis);
   const uncommittedChange = { type: ChangeTypes.Upgrade, meta };
@@ -165,6 +166,7 @@ class HabitatsState extends React.Component<Props, State> {
       initBasis: {},
       basis: null,
       uncommittedChange: null,
+      upgradeBudget: '',
     };
   }
 
@@ -185,6 +187,9 @@ class HabitatsState extends React.Component<Props, State> {
         }
         if (storedState.penguins) {
           state.penguins = storedState.penguins;
+        }
+        if (storedState.upgradeBudget) {
+          state.upgradeBudget = storedState.upgradeBudget;
         }
 
         this.setState(state);
@@ -235,9 +240,31 @@ class HabitatsState extends React.Component<Props, State> {
       );
     }
 
+    if (uncommittedChange) {
+      return (
+        <DisplayUncommittedChange
+          change={uncommittedChange}
+          onDone={extra => () =>
+            this.setState(commitChange({ ...uncommittedChange, extra }))}
+          onCancel={() => this.setState(cancelChange())}
+        />
+      );
+    }
+
+    const upgradeBudgetInput = this.state.upgradeBudget;
+    const upgradeBudgetValue = habitats.ValidateField.cost(upgradeBudgetInput);
     return (
       <>
-        <button onClick={() => this.setState(suggestUpgrades([10, 'k']))}>
+        <Input
+          onChange={upgradeBudget => this.setState({ upgradeBudget })}
+          placeholder={InitBasisPlaceholders.cost}
+          validate={value => !!habitats.ValidateField.cost(value)}
+          value={upgradeBudgetInput}
+        />
+        <button
+          disabled={!upgradeBudgetValue}
+          onClick={() => this.setState(suggestUpgrades(upgradeBudgetValue))}
+        >
           Upgrade
         </button>
         <button onClick={() => this.setState(suggestEvolve())}>Evolve</button>
@@ -245,15 +272,6 @@ class HabitatsState extends React.Component<Props, State> {
         <div>Penguins</div>
         <div>{penguins}</div>
         <button onClick={() => this.setState(addPenguin())}>+</button>
-
-        {!uncommittedChange ? null : (
-          <DisplayUncommittedChange
-            change={uncommittedChange}
-            onDone={extra => () =>
-              this.setState(commitChange({ ...uncommittedChange, extra }))}
-            onCancel={() => this.setState(cancelChange())}
-          />
-        )}
 
         {habitats.All.map<any>(habitat => {
           const habitatBasis = basis[habitat];
@@ -270,6 +288,7 @@ class HabitatsState extends React.Component<Props, State> {
               </HabitatRow>
             );
           }
+
           return (
             <HabitatRow
               key={habitat}
@@ -300,7 +319,10 @@ class HabitatsState extends React.Component<Props, State> {
     const basis = this._getInputs();
 
     return (
-      <button disabled={!basis} onClick={() => this.setState({ basis })}>
+      <button
+        disabled={!basis}
+        onClick={() => this.setState({ initBasis: {}, basis })}
+      >
         Save
       </button>
     );

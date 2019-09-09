@@ -4,15 +4,14 @@ import _cloneDeep from 'lodash/cloneDeep';
 
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
-import scales from '~/constants/scales';
 
 export default function spendGold(
-  totalGold: ShortNotation,
+  totalGold: number,
   initBasis: HabitatBasisCollection
 ) {
   let basis = _cloneDeep(initBasis);
   let finalBasis = _cloneDeep(initBasis);
-  let goldLeft = scales.toNumber(totalGold);
+  let goldLeft = totalGold;
 
   // let iter = 0;
   while (goldLeft) {
