@@ -18,4 +18,9 @@ export default createGlobalStyle`
     overflow-y: scroll; /* has to be scroll, not auto */
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Prevent zoom on mobile devices */
+  input {
+    font-size: 16px;
+  }
 `;
