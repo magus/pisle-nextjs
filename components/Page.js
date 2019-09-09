@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import StyleReset from '~/components/StyleReset';
 import GlobalStyles from '~/components/GlobalStyles';
 
+import Styles from '~/constants/styles';
+
 function preventPullToRefresh(element) {
   if (!element) return;
 
@@ -59,5 +61,5 @@ export default class Page extends React.Component<Props> {
 }
 
 const Container = styled.div`
-  color: #000;
+  color: ${Styles.Colors.Black};
 `;

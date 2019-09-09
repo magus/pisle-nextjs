@@ -24,6 +24,9 @@ function HabitatContentStats({
       <HabitatContentRow>
         <HabitatRate>{`${basisString} / ${rate}Sec`}</HabitatRate>
       </HabitatContentRow>
+      <HabitatContentRow>
+        <pre>{JSON.stringify(basis, null, 2)}</pre>
+      </HabitatContentRow>
     </>
   );
 }

@@ -3,7 +3,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { HabitatContentRow } from '~/components/HabitatRow';
+import {
+  HabitatContentRow,
+  HabitatRate,
+  HabitatGoldPerSecond,
+} from '~/components/HabitatRow';
 
 import Styles from '~/constants/styles';
 import habitats from '~/constants/habitats';
@@ -17,15 +21,32 @@ function HabitatEvolveStats({
   basis: HabitatBasis,
 }) {
   const { rate } = habitats.Metadata[habitat];
-  const basisString = scales.numberToShortString(basis.gold);
   const meta = habitats.getMetadata(habitat, basis);
+
+  const newGoldValue = basis.gold * basis.multiplier;
+  const newGoldPerSecondValue = meta.goldPerSecond * basis.multiplier;
+
+  const newGold = scales.numberToShortString(newGoldValue);
+  const oldGold = scales.numberToShortString(basis.gold);
+  const goldInc = scales.numberToShortString(newGoldValue - basis.gold);
 
   return (
     <>
       <HabitatContentRow>
-        <HabitatRate>{`${basisString} / ${rate}Sec`}</HabitatRate>
-
-        <pre>{JSON.stringify(meta, null, 2)}</pre>
+        <HabitatRate>
+          <span>{`${newGold} `}</span>
+          <RateMath>{`(${oldGold} + ${goldInc})`}</RateMath>
+          <span>{` / ${rate}Sec`}</span>
+        </HabitatRate>
+        <HabitatGoldPerSecond>
+          <span>{`${scales.numberToShortString(newGoldPerSecondValue)} `}</span>
+          <RateMath>{`(${scales.numberToShortString(
+            meta.goldPerSecond
+          )} + ${scales.numberToShortString(
+            newGoldPerSecondValue - meta.goldPerSecond
+          )})`}</RateMath>
+          <span>{` / Sec`}</span>
+        </HabitatGoldPerSecond>
       </HabitatContentRow>
     </>
   );
@@ -33,8 +54,8 @@ function HabitatEvolveStats({
 
 export default HabitatEvolveStats;
 
-const HabitatRate = styled.div`
-  font-size: ${Styles.Fonts.Small}px;
-  font-weight: ${Styles.Fonts.Weight.Heavy};
-  color: ${Styles.Colors.Gold};
+const RateMath = styled.span`
+  font-size: ${Styles.Fonts.Smaller}px;
+  font-weight: ${Styles.Fonts.Weight.Light};
+  color: ${Styles.Colors.Orange};
 `;

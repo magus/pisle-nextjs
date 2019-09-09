@@ -1,7 +1,5 @@
 // @flow strict
 
-import game from '~/constants/game';
-
 const Habitats = {
   FishingSpot: 'FishingSpot',
   FlowerGarden: 'FlowerGarden',
@@ -27,7 +25,6 @@ function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
   const habitatMeta = Metadata[habitat];
   const { cost, gold, hearts } = basis;
 
-  const goldIncrease = gold - basis.gold;
   const goldPerSecond = gold / habitatMeta.rate;
   const goldPerSecondPerCost = goldPerSecond / cost;
   const goldPerSecondPerHeart = (goldPerSecond * basis.multiplier) / hearts;
@@ -35,7 +32,6 @@ function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
   return {
     habitat,
     cost,
-    goldIncrease,
     goldPerSecond,
     goldPerSecondPerCost,
     goldPerSecondPerHeart,

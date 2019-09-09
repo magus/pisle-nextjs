@@ -81,3 +81,15 @@ export const HabitatContentRowSpacer = styled.div`
   height: 1px;
   background: ${Styles.Colors.Gray};
 `;
+
+export const HabitatRate = styled.div`
+  font-size: ${Styles.Fonts.Small}px;
+  font-weight: ${Styles.Fonts.Weight.Heavy};
+  color: ${Styles.Colors.Gold};
+`;
+
+export const HabitatGoldPerSecond = styled.div`
+  font-size: ${Styles.Fonts.Smaller}px;
+  font-weight: ${Styles.Fonts.Weight.Normal};
+  color: ${Styles.Colors.Gold};
+`;
