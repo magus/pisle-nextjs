@@ -14,7 +14,6 @@ import spendGold from '~/src/algorithms/spendGold';
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
 import Styles from '~/constants/styles';
-import colors from '../constants/styles/colors';
 
 type Props = {||};
 
@@ -92,8 +91,9 @@ const commitChange = change => state => {
   switch (change.type) {
     case ChangeTypes.Upgrade: {
       console.info('commit', ChangeTypes.Upgrade);
-      Object.keys(change.meta).forEach(habitat => {
-        basis[habitat].level = change.meta[habitat].level;
+      const finalBasis = change.meta.final;
+      Object.keys(finalBasis).forEach(habitat => {
+        basis[habitat] = { ...finalBasis[habitat] };
       });
       break;
     }
@@ -111,7 +111,7 @@ const commitChange = change => state => {
   }
 
   // clear uncommitted change
-  return { uncommittedChange: null };
+  return { basis, uncommittedChange: null };
 };
 
 const setInitBasis = (habitat, updateBlob) => state => {
@@ -402,7 +402,7 @@ class EvolveChange extends React.Component<ChangeProps, EvolveChangeState> {
               hearts,
               multiplier,
             })
-          : onDone();
+          : () => {};
 
       return (
         <>

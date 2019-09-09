@@ -19,8 +19,9 @@ export default function spendGold(
     // iter++;
     let best = null;
 
-    for (let i = 0; i < habitats.All.length; i++) {
-      const habitat = habitats.All[i];
+    const allHabitats = Object.keys(basis);
+    for (let i = 0; i < allHabitats.length; i++) {
+      const habitat = allHabitats[i];
       const meta = habitats.getMetadata(habitat, finalBasis[habitat]);
       if (!best || meta.goldPerSecondPerCost > best.goldPerSecondPerCost) {
         best = meta;
