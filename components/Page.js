@@ -33,6 +33,7 @@ function preventPullToRefresh(element) {
 
 type Props = {
   children: any,
+  preventPullToRefresh: boolean,
 };
 
 export default class Page extends React.Component<Props> {
@@ -44,7 +45,9 @@ export default class Page extends React.Component<Props> {
     this.containerRef = React.createRef();
   }
   componentDidMount() {
-    preventPullToRefresh(this.containerRef.current);
+    if (this.props.preventPullToRefresh) {
+      preventPullToRefresh(this.containerRef.current);
+    }
   }
 
   render() {
