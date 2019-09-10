@@ -7,7 +7,7 @@ import {
   HabitatContentRow,
   HabitatRate,
   HabitatGoldPerSecond,
-} from '~/components/HabitatRow';
+} from '~/components/Habitats/HabitatRow';
 
 import Styles from '~/constants/styles';
 import habitats from '~/constants/habitats';

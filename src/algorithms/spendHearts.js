@@ -6,8 +6,9 @@ export default function spendHearts(basis: HabitatBasisCollection) {
   let best = null;
   const all = [];
 
-  for (let i = 0; i < habitats.All.length; i++) {
-    const habitat = habitats.All[i];
+  const allHabitats = Object.keys(basis);
+  for (let i = 0; i < allHabitats.length; i++) {
+    const habitat = allHabitats[i];
     const meta = habitats.getMetadata(habitat, basis[habitat]);
     all.push(meta);
     if (!best || meta.goldPerSecondPerHeart > best.goldPerSecondPerHeart) {

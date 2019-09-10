@@ -4,11 +4,12 @@ import * as React from 'react';
 
 import type { Props as ChangeProps } from '~/components/Changes/UncommittedChange';
 
-import HabitatRow from '~/components/HabitatRow';
-import HabitatEvolveStats from '~/components/HabitatRow/HabitatEvolveStats';
-import Input from '~/components/Input';
-import { Instructions } from '~/components/Styled';
+import HabitatRow from '~/components/Habitats/HabitatRow';
+import HabitatEvolveStats from '~/components/Habitats/HabitatRow/HabitatEvolveStats';
+import Input from '~/components/common/Input';
+import { Instructions } from '~/components/common/Styled';
 
+import spendHearts from '~/src/algorithms/spendHearts';
 import habitats from '~/constants/habitats';
 
 type State = {
@@ -113,8 +114,13 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
   _renderChange() {
     const { change } = this.props;
 
-    return Object.keys(change.meta).map<React$Element<typeof HabitatRow>>(
-      habitat => {
+    const spendHeartMeta = spendHearts(change.meta);
+
+    // sort by spendHeart algorithm
+    return spendHeartMeta.map<React$Element<typeof HabitatRow>>(
+      habitatBasis => {
+        const habitat = habitatBasis.habitat;
+
         return (
           <HabitatRow
             key={habitat}
