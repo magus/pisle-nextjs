@@ -101,9 +101,9 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
     let content;
 
     if (!habitat) {
-      content = 'Select a Habitat to evolve with Hearts';
+      content = 'Select a Habitat to evolve with Hearts (sorted best to worst)';
     } else if (!valid) {
-      content = 'Enter new heart cost and % multiplier';
+      content = 'Enter new heart cost and multiplier from game';
     } else if (valid) {
       content = 'Looks good, click Done';
     }

@@ -16,12 +16,13 @@ export default function spendHearts(basis: HabitatBasisCollection) {
     }
   }
 
-  // sort lowest to highest
+  // Sort highest to lowest
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Description
   all.sort((a, b) => {
     if (a.goldPerSecondPerHeart > b.goldPerSecondPerHeart) {
-      return 1;
-    } else if (b.goldPerSecondPerHeart > a.goldPerSecondPerHeart) {
       return -1;
+    } else if (b.goldPerSecondPerHeart > a.goldPerSecondPerHeart) {
+      return +1;
     } else {
       return 0;
     }
