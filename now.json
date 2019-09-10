@@ -1,1 +1,4 @@
-{"name":"pisle-nextjs"}
+{
+  "name": "pisle-nextjs",
+  "alias": "pisle.now.sh"
+}
