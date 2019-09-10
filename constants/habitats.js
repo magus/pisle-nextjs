@@ -14,6 +14,14 @@ const Habitats = {
 
 const All: HabitatTypes[] = Object.keys(Habitats);
 
+export const HabitatFields = {
+  level: 'level',
+  gold: 'gold',
+  cost: 'cost',
+  hearts: 'hearts',
+  multiplier: 'multiplier',
+};
+
 // metadata about habitat required
 // {
 //   level: 0,      // level of habitat
@@ -133,6 +141,7 @@ const ValidateField = {
 export default {
   ...Habitats,
   All,
+  HabitatFields,
   ValidateField,
   Habitats,
   Metadata,

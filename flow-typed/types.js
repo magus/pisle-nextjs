@@ -4,13 +4,9 @@ import habitats from '~/constants/habitats';
 import scales from '~/constants/scales';
 
 declare type HabitatTypes = $Keys<typeof habitats.Habitats>;
-declare type HabitatBasis = {|
-  level: number,
-  gold: number,
-  cost: number,
-  hearts: number,
-  multiplier: number,
-|};
+declare type HabitatBasis = {
+  [field: $Keys<typeof habitats.HabitatFields>]: number,
+};
 declare type HabitatBasisCollection = {
   [habitat: HabitatTypes]: HabitatBasis,
 };

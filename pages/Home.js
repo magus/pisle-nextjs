@@ -1,38 +1,24 @@
 // @flow strict
 
-import * as React from 'react';
-import styled from 'styled-components';
+import type { Change } from '~/components/Changes';
 
+import * as React from 'react';
+
+import { ChangeTypes } from '~/components/Changes';
 import CustomHead from '~/components/CustomHead';
-import Page from '~/components/Page';
 import HabitatRow from '~/components/HabitatRow';
 import HabitatContentStats from '~/components/HabitatRow/HabitatContentStats';
-import HabitatEvolveStats from '~/components/HabitatRow/HabitatEvolveStats';
+import Input from '~/components/Input';
+import { Instructions } from '~/components/Styled';
+import Page from '~/components/Page';
+import UncommittedChange from '~/components/Changes/UncommittedChange';
 
 import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
-import Styles from '~/constants/styles';
 
 type Props = {||};
-
-const ChangeTypes = {
-  Upgrade: 'Upgrade',
-  Evolve: 'Evolve',
-};
-
-type ChangeType = $Keys<typeof ChangeTypes>;
-type Change = {|
-  type: ChangeType,
-  meta: any,
-|};
-
-type EvolveUpdate = {
-  habitat: HabitatTypes,
-  multiplier: number,
-  hearts: number,
-};
 
 type State = {|
   penguins: number,
@@ -125,48 +111,6 @@ const setInitBasis = (habitat, updateBlob) => state => {
 };
 
 const LocalStorageKey = 'pisle-nextjs';
-const InitBasisPlaceholders = {
-  level: '42',
-  gold: '23.81g',
-  cost: '376.98g',
-  hearts: '1.00 c',
-  multiplier: '300%',
-};
-
-type InputProps = {
-  label: string,
-  onChange: (value: string) => void,
-  placeholder: string,
-  validate: (value: string) => boolean,
-  value: string,
-};
-
-class Input extends React.Component<InputProps> {
-  render() {
-    const { label, validate, value, onChange, placeholder } = this.props;
-
-    return (
-      <label>
-        <InputLabel>{label}</InputLabel>
-        <StyledInput
-          invalid={value && !validate(value)}
-          onChange={event => onChange(event.target.value)}
-          value={value}
-          placeholder={placeholder}
-        />
-      </label>
-    );
-  }
-}
-
-const StyledInput = styled.input`
-  border: 1px solid
-    ${props => (props.invalid ? Styles.Colors.Orange : Styles.Colors.Gray)};
-`;
-
-const InputLabel = styled.span`
-  margin: 0 ${Styles.Spacing.Small}px 0 0;
-`;
 
 class HabitatsState extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -253,7 +197,7 @@ class HabitatsState extends React.Component<Props, State> {
 
     if (uncommittedChange) {
       return (
-        <DisplayUncommittedChange
+        <UncommittedChange
           change={uncommittedChange}
           onDone={extra => () =>
             this.setState(commitChange({ ...uncommittedChange, extra }))}
@@ -269,7 +213,7 @@ class HabitatsState extends React.Component<Props, State> {
         <Input
           label="Budget"
           onChange={upgradeBudget => this.setState({ upgradeBudget })}
-          placeholder={InitBasisPlaceholders.cost}
+          placeholderType="cost"
           validate={value => !!habitats.ValidateField.cost(value)}
           value={upgradeBudgetInput}
         />
@@ -285,7 +229,7 @@ class HabitatsState extends React.Component<Props, State> {
         <div>{penguins}</div>
         <button onClick={() => this.setState(addPenguin())}>+</button>
 
-        {habitats.All.map<any>(habitat => {
+        {habitats.All.map<React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];
           if (habitatBasis) {
             return (
@@ -375,7 +319,7 @@ class HabitatsState extends React.Component<Props, State> {
             console.info('clicked', habitat);
           }}
         >
-          {['level', 'gold', 'cost', 'hearts', 'multiplier'].map(field => {
+          {Object.keys(habitats.HabitatFields).map(field => {
             return (
               <Input
                 key={`${habitat}-${field}`}
@@ -383,7 +327,7 @@ class HabitatsState extends React.Component<Props, State> {
                 onChange={value =>
                   this.setState(setInitBasis(habitat, { [field]: value }))
                 }
-                placeholder={InitBasisPlaceholders[field]}
+                placeholderType={HabitatBasisFieldPlaceholderTypes[field]}
                 validate={value => !!habitats.ValidateField[field](value)}
                 value={initBasis[habitat][field]}
               />
@@ -395,154 +339,13 @@ class HabitatsState extends React.Component<Props, State> {
   };
 }
 
-type ChangeProps = {|
-  onCancel: () => void,
-  onDone: (extra: ?EvolveUpdate) => () => void,
-  change: Change,
-|};
-
-type EvolveChangeState = {
-  habitat: ?HabitatTypes,
-  hearts: string,
-  multiplier: string,
+const HabitatBasisFieldPlaceholderTypes = {
+  [habitats.HabitatFields.level]: 'numeric',
+  [habitats.HabitatFields.gold]: 'cost',
+  [habitats.HabitatFields.cost]: 'cost',
+  [habitats.HabitatFields.hearts]: 'cost',
+  [habitats.HabitatFields.multiplier]: 'multiplier',
 };
-
-class EvolveChange extends React.Component<ChangeProps, EvolveChangeState> {
-  state = {
-    habitat: null,
-    hearts: '',
-    multiplier: '',
-  };
-
-  _getInputs() {
-    const hearts = habitats.ValidateField.hearts(this.state.hearts);
-    const multiplier = habitats.ValidateField.multiplier(this.state.multiplier);
-    return {
-      valid: !!(hearts && multiplier),
-      hearts,
-      multiplier,
-    };
-  }
-
-  render() {
-    const { onDone, onCancel } = this.props;
-    const { habitat } = this.state;
-    const { valid, hearts, multiplier } = this._getInputs();
-
-    if (habitat) {
-      const onClick =
-        valid && hearts && multiplier
-          ? onDone({
-              habitat,
-              hearts,
-              multiplier,
-            })
-          : () => {};
-
-      return (
-        <>
-          {this._renderInstructions()}
-          {this._renderInputs()}
-          <button disabled={!valid} onClick={onClick}>
-            Done
-          </button>
-          <button onClick={onCancel}>Cancel</button>
-        </>
-      );
-    }
-
-    return (
-      <>
-        {this._renderInstructions()}
-        {this._renderChange()}
-      </>
-    );
-  }
-
-  _renderInputs() {
-    const { hearts, multiplier } = this.state;
-
-    return (
-      <>
-        <Input
-          label="❤️"
-          onChange={hearts => this.setState({ hearts })}
-          placeholder={InitBasisPlaceholders.hearts}
-          validate={value => !!habitats.ValidateField.hearts(value)}
-          value={hearts}
-        />
-        <Input
-          label="Multipler %"
-          onChange={multiplier => this.setState({ multiplier })}
-          placeholder={InitBasisPlaceholders.multiplier}
-          validate={value => !!habitats.ValidateField.multiplier(value)}
-          value={multiplier}
-        />
-      </>
-    );
-  }
-
-  _renderInstructions() {
-    const { habitat } = this.state;
-    const { valid } = this._getInputs();
-
-    let content;
-
-    if (!habitat) {
-      content = 'Select a Habitat to evolve with Hearts';
-    } else if (!valid) {
-      content = 'Enter new heart cost and % multiplier';
-    } else if (valid) {
-      content = 'Looks good, click Done';
-    }
-
-    return <Instructions>{content}</Instructions>;
-  }
-
-  _renderChange() {
-    const { change } = this.props;
-
-    return Object.keys(change.meta).map(habitat => {
-      return (
-        <HabitatRow
-          key={habitat}
-          habitat={habitat}
-          onClick={habitat => this.setState({ habitat })}
-        >
-          <HabitatEvolveStats habitat={habitat} basis={change.meta[habitat]} />
-        </HabitatRow>
-      );
-    });
-  }
-}
-
-function DisplayUncommittedChange({ change, onCancel, onDone }: ChangeProps) {
-  if (!change) return null;
-
-  switch (change.type) {
-    case ChangeTypes.Upgrade: {
-      return (
-        <>
-          <div>
-            Make the following changes in your game, then click Done below
-          </div>
-          <pre>{JSON.stringify(change, null, 2)}</pre>
-          <button onClick={onDone()}>Done</button>
-          <button onClick={onCancel}>Cancel</button>
-        </>
-      );
-    }
-    case ChangeTypes.Evolve: {
-      console.info('DisplayUncommittedChange', ChangeTypes.Evolve, change);
-      return (
-        <EvolveChange change={change} onDone={onDone} onCancel={onCancel} />
-      );
-    }
-    default:
-      console.error('DisplayUncommittedChange', change);
-      return null;
-  }
-}
 
 const Home = () => {
   // console.info('spendGold', spendGold([2, 'l'], initHabitatBasisCollection));
@@ -557,8 +360,3 @@ const Home = () => {
 };
 
 export default Home;
-
-const Instructions = styled.div`
-  text-align: center;
-  font-size: ${Styles.Fonts.Large}px;
-`;
