@@ -16,28 +16,36 @@ export default function spendGold(
   // let iter = 0;
   while (goldLeft) {
     // iter++;
-    let best = null;
 
     const allHabitats = Object.keys(basis);
+    const allHabitatsMeta = [];
     for (let i = 0; i < allHabitats.length; i++) {
       const habitat = allHabitats[i];
-      const meta = habitats.getMetadata(habitat, finalBasis[habitat]);
-      if (!best || meta.goldPerSecondPerCost > best.goldPerSecondPerCost) {
-        best = meta;
+      allHabitatsMeta.push(habitats.getMetadata(habitat, finalBasis[habitat]));
+    }
+
+    // sort by meta habitat values
+    allHabitatsMeta.sort((a, b) => {
+      if (a.goldPerSecondPerCost > b.goldPerSecondPerCost) {
+        return -1;
+      } else if (b.goldPerSecondPerCost > a.goldPerSecondPerCost) {
+        return +1;
+      } else {
+        return 0;
+      }
+    });
+
+    // move through sorted metas (best to worst) to find first we can afford
+    let foundBest;
+    for (let i = 0; i < allHabitatsMeta.length; i++) {
+      if (allHabitatsMeta[i].cost <= goldLeft) {
+        foundBest = allHabitatsMeta[i];
+        break;
       }
     }
 
-    const foundBest = best;
-
-    if (!foundBest) throw new Error('best not set, unexpected error');
-
-    // best is too expensive, exit while loop
-    if (foundBest.cost > goldLeft) {
-      // console.info(
-      //   'too expensive, exiting spend gold',
-      //   foundBest,
-      //   scales.numberToShortString(foundBest.cost)
-      // );
+    // out of gold, all habitats exceed gold left, exit while loop
+    if (!foundBest) {
       break;
     }
 
