@@ -549,7 +549,7 @@ const Home = () => {
 
   return (
     <Page>
-      <CustomHead title="Home" />
+      <CustomHead />
 
       <HabitatsState />
     </Page>

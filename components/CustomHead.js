@@ -2,12 +2,13 @@ import React from 'react';
 import NextHead from 'next/head';
 import { string } from 'prop-types';
 
-const defaultDescription = "Optimize Penguin's Isle upgrades";
+const defaultDescription =
+  "Use this app to input your Penguin's Isle habitats to optimze upgrades and evolutions!";
 const defaultOGURL = 'https://pisle-nextjs.noah.now.sh/';
 const defaultOGImage = '/static/summary-image.jpg';
 
 const Head = props => {
-  const title = props.title || '';
+  const title = props.title || "Penuin's Isle Optimizer";
   const description = props.description || defaultDescription;
   const url = props.url || defaultOGURL;
   const image = {
