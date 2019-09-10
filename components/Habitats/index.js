@@ -267,17 +267,7 @@ export default class Habitats extends React.Component<Props, State> {
             );
           }
 
-          return (
-            <HabitatRow
-              key={habitat}
-              habitat={habitat}
-              onClick={habitat => {
-                console.info('clicked', habitat);
-              }}
-            >
-              Not Unlocked
-            </HabitatRow>
-          );
+          return null;
         })}
 
         {this._renderReset()}

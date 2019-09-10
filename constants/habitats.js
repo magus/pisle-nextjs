@@ -10,6 +10,8 @@ const Habitats = {
   AntarcticBase: 'AntarcticBase',
   SeagullNest: 'SeagullNest',
   AmusementPark: 'AmusementPark',
+  IglooCamp: 'IglooCamp',
+  SculpturePark: 'SculpturePark',
 };
 
 const All: HabitatTypes[] = Object.keys(Habitats);
@@ -50,7 +52,9 @@ function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
 
 // name    in-game string identifying this habitat
 // rate    rate in seconds per gold tick
-const Metadata = {
+const Metadata: {|
+  [habitat: HabitatsType]: { name: string, rate: number },
+|} = {
   [Habitats.FishingSpot]: {
     name: 'Fishing Spot',
     rate: 3,
@@ -77,6 +81,14 @@ const Metadata = {
   },
   [Habitats.AmusementPark]: {
     name: 'Amusement Park',
+    rate: 10,
+  },
+  [Habitats.IglooCamp]: {
+    name: 'Igloo Camp',
+    rate: 10,
+  },
+  [Habitats.SculpturePark]: {
+    name: 'Sculpture Park',
     rate: 10,
   },
 };
