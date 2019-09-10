@@ -6,6 +6,9 @@ import * as React from 'react';
 
 import { ChangeTypes } from '~/components/Changes';
 import EvolveChange from '~/components/Changes/EvolveChange';
+import HabitatRow from '~/components/Habitats/HabitatRow';
+import HabitatUpgradeStats from '~/components/Habitats/HabitatRow/HabitatUpgradeStats';
+import { Instructions } from '~/components/common/Styled';
 
 export type Props = {|
   onCancel: () => void,
@@ -18,12 +21,46 @@ export default function UncommittedChange({ change, onCancel, onDone }: Props) {
 
   switch (change.type) {
     case ChangeTypes.Upgrade: {
+      const habitatDeltas = Object.keys(change.meta.final)
+        .map(habitat => {
+          const oldLevel = change.meta.original[habitat].level;
+          const newLevel = change.meta.final[habitat].level;
+          const levelDelta = newLevel - oldLevel;
+
+          if (levelDelta === 0) return null;
+
+          return { habitat, oldLevel, newLevel, levelDelta };
+        })
+        .filter(v => v);
+
+      if (!habitatDeltas.length) {
+        return (
+          <>
+            <Instructions>No upgrades possible 😢</Instructions>
+            <button onClick={onCancel}>Ok</button>
+          </>
+        );
+      }
+
       return (
         <>
-          <div>
+          <Instructions>
             Make the following changes in your game, then click Done below
-          </div>
-          <pre>{JSON.stringify(change, null, 2)}</pre>
+          </Instructions>
+
+          {habitatDeltas.map(habitatUpgrade => {
+            const { habitat, oldLevel, newLevel, levelDelta } = habitatUpgrade;
+            return (
+              <HabitatRow key={habitat} habitat={habitat}>
+                <HabitatUpgradeStats
+                  oldLevel={oldLevel}
+                  newLevel={newLevel}
+                  levelDelta={levelDelta}
+                />
+              </HabitatRow>
+            );
+          })}
+
           <button onClick={onDone()}>Done</button>
           <button onClick={onCancel}>Cancel</button>
         </>

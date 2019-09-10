@@ -15,7 +15,7 @@ import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
-import scales from '../../constants/scales';
+import scales from '~/constants/scales';
 
 type Props = {||};
 
