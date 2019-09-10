@@ -46,7 +46,7 @@ const addPenguin = () => state => {
 
   // update all gold values for habitat basis
   Object.keys(basis).forEach(habitat => {
-    basis[habitat].gold = basis[habitat].gold * game.GoldIncreaseFactor;
+    basis[habitat].gold = basis[habitat].gold * game.PenguinIncreaseFactor;
   });
 
   return { basis, penguins, uncommittedChange: null };
