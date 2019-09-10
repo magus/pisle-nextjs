@@ -15,20 +15,23 @@ import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
+import scales from '../../constants/scales';
 
 type Props = {||};
 
+type InitBasisCollection = {
+  [habitat: HabitatTypes]: {
+    level: string,
+    gold: string,
+    cost: string,
+    hearts: string,
+    multiplier: string,
+  },
+};
+
 type State = {|
   penguins: number,
-  initBasis: {
-    [habitat: HabitatTypes]: {
-      level: string,
-      gold: string,
-      cost: string,
-      hearts: string,
-      multiplier: string,
-    },
-  },
+  initBasis: InitBasisCollection,
   basis: ?HabitatBasisCollection,
   uncommittedChange: ?Change,
   upgradeBudget: string,
@@ -108,6 +111,24 @@ const setInitBasis = (habitat, updateBlob) => state => {
   return { initBasis };
 };
 
+const startEdit = () => state => {
+  const { basis } = state;
+  if (!basis) return;
+  const initBasis: InitBasisCollection = {};
+  Object.keys(basis).forEach(habitat => {
+    const basisHabitat = basis[habitat];
+    initBasis[habitat] = {
+      level: `${basisHabitat.level}`,
+      gold: scales.numberToShortString(basisHabitat.gold),
+      cost: scales.numberToShortString(basisHabitat.cost),
+      hearts: scales.numberToShortString(basisHabitat.hearts),
+      multiplier: `${basisHabitat.multiplier * 100}%`,
+    };
+  });
+
+  return { basis: null, initBasis };
+};
+
 const LocalStorageKey = 'pisle-nextjs';
 
 export default class Habitats extends React.Component<Props, State> {
@@ -115,7 +136,7 @@ export default class Habitats extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      penguins: 43,
+      penguins: 0,
       initBasis: {},
       basis: null,
       uncommittedChange: null,
@@ -221,11 +242,14 @@ export default class Habitats extends React.Component<Props, State> {
         >
           Upgrade
         </button>
+
         <button onClick={() => this.setState(suggestEvolve())}>Evolve</button>
 
         <div>Penguins</div>
         <div>{penguins}</div>
         <button onClick={() => this.setState(addPenguin())}>+</button>
+
+        <button onClick={() => this.setState(startEdit())}>Edit</button>
 
         {habitats.All.map<React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];
