@@ -49,6 +49,8 @@ export default function UncommittedChange({ change, onCancel, onDone }: Props) {
           </Instructions>
 
           {habitatDeltas.map(habitatUpgrade => {
+            if (!habitatUpgrade) return null;
+
             const { habitat, oldLevel, newLevel, levelDelta } = habitatUpgrade;
             return (
               <HabitatRow key={habitat} habitat={habitat}>

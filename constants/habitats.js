@@ -52,9 +52,9 @@ function getMetadata(habitat: HabitatTypes, basis: HabitatBasis) {
 
 // name    in-game string identifying this habitat
 // rate    rate in seconds per gold tick
-const Metadata: {|
-  [habitat: HabitatsType]: { name: string, rate: number },
-|} = {
+const Metadata: {
+  [habitat: HabitatTypes]: { name: string, rate: number },
+} = {
   [Habitats.FishingSpot]: {
     name: 'Fishing Spot',
     rate: 3,

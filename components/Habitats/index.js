@@ -30,7 +30,6 @@ type InitBasisCollection = {
 };
 
 type State = {|
-  penguins: number,
   initBasis: InitBasisCollection,
   basis: ?HabitatBasisCollection,
   uncommittedChange: ?Change,
@@ -42,14 +41,12 @@ const addPenguin = () => state => {
 
   if (!basis) return;
 
-  const penguins = state.penguins + 1;
-
   // update all gold values for habitat basis
   Object.keys(basis).forEach(habitat => {
     basis[habitat].gold = basis[habitat].gold * game.PenguinIncreaseFactor;
   });
 
-  return { basis, penguins, uncommittedChange: null };
+  return { basis, uncommittedChange: null };
 };
 
 const suggestUpgrades = budget => state => {
@@ -136,7 +133,6 @@ export default class Habitats extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      penguins: 0,
       initBasis: {},
       basis: null,
       uncommittedChange: null,
@@ -158,9 +154,6 @@ export default class Habitats extends React.Component<Props, State> {
         }
         if (storedState.initBasis) {
           state.initBasis = storedState.initBasis;
-        }
-        if (storedState.penguins) {
-          state.penguins = storedState.penguins;
         }
         if (storedState.upgradeBudget) {
           state.upgradeBudget = storedState.upgradeBudget;
@@ -199,7 +192,7 @@ export default class Habitats extends React.Component<Props, State> {
   }
 
   render() {
-    const { basis, penguins, uncommittedChange } = this.state;
+    const { basis, uncommittedChange } = this.state;
 
     if (!basis) {
       return (
@@ -250,7 +243,7 @@ export default class Habitats extends React.Component<Props, State> {
 
         <button onClick={() => this.setState(startEdit())}>Edit</button>
 
-        {habitats.All.map<React$Element<typeof HabitatRow>>(habitat => {
+        {habitats.All.map<null | React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];
           if (habitatBasis) {
             return (
