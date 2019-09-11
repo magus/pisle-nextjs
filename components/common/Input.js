@@ -8,11 +8,13 @@ import Styles from '~/constants/styles';
 const PlaceholderTypes = {
   numeric: '42',
   cost: '23.81g',
+  hearts: '1.00d',
   multiplier: '300%',
 };
 
 type InputProps = {
-  label: string,
+  color?: string,
+  label?: string,
   onChange: (value: string) => void,
   placeholderType?: $Keys<typeof PlaceholderTypes>,
   placeholder?: String,
@@ -23,6 +25,7 @@ type InputProps = {
 export default class Input extends React.Component<InputProps> {
   render() {
     const {
+      color,
       label,
       validate,
       value,
@@ -40,6 +43,7 @@ export default class Input extends React.Component<InputProps> {
       <label>
         <InputLabel>{label}</InputLabel>
         <StyledInput
+          color={color}
           invalid={value && !validate(value)}
           onChange={event => onChange(event.target.value)}
           value={value}
@@ -51,6 +55,8 @@ export default class Input extends React.Component<InputProps> {
 }
 
 const StyledInput = styled.input`
+  color: ${props => props.color || 'inherit'};
+  width: 100%;
   border: 1px solid
     ${props => (props.invalid ? Styles.Colors.Orange : Styles.Colors.Gray)};
 `;

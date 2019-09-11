@@ -3,6 +3,7 @@
 import type { Change } from '~/components/Changes';
 
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { ChangeTypes } from '~/components/Changes';
 import HabitatRow from '~/components/Habitats/HabitatRow';
@@ -306,6 +307,21 @@ export default class Habitats extends React.Component<Props, State> {
         );
       }
 
+      const InputProps = {};
+
+      Object.keys(habitats.HabitatFields).map(field => {
+        InputProps[field] = (
+          <InlineInput
+            onChange={value =>
+              this.setState(setInitBasis(habitat, { [field]: value }))
+            }
+            placeholderType={HabitatBasisFieldPlaceholderTypes[field]}
+            validate={value => !!habitats.ValidateField[field](value)}
+            value={initBasis[habitat][field]}
+          />
+        );
+      });
+
       return (
         <HabitatRow
           key={habitat}
@@ -314,30 +330,30 @@ export default class Habitats extends React.Component<Props, State> {
             console.info('clicked', habitat);
           }}
         >
-          {Object.keys(habitats.HabitatFields).map(field => {
-            return (
-              <Input
-                key={`${habitat}-${field}`}
-                label={field}
-                onChange={value =>
-                  this.setState(setInitBasis(habitat, { [field]: value }))
-                }
-                placeholderType={HabitatBasisFieldPlaceholderTypes[field]}
-                validate={value => !!habitats.ValidateField[field](value)}
-                value={initBasis[habitat][field]}
-              />
-            );
-          })}
+          <HabitatContentStats habitat={habitat} {...InputProps} />
         </HabitatRow>
       );
     });
   };
 }
 
+function InlineInput(props) {
+  return (
+    <InlineInputContainer>
+      <Input {...props} />
+    </InlineInputContainer>
+  );
+}
+
+const InlineInputContainer = styled.div`
+  width: 75px;
+  display: inline-block;
+`;
+
 const HabitatBasisFieldPlaceholderTypes = {
   [habitats.HabitatFields.level]: 'numeric',
   [habitats.HabitatFields.gold]: 'cost',
   [habitats.HabitatFields.cost]: 'cost',
-  [habitats.HabitatFields.hearts]: 'cost',
+  [habitats.HabitatFields.hearts]: 'hearts',
   [habitats.HabitatFields.multiplier]: 'multiplier',
 };

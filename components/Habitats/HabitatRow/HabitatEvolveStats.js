@@ -3,11 +3,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {
-  HabitatContentRow,
-  HabitatRate,
-  HabitatGoldPerSecond,
-} from '~/components/Habitats/HabitatRow';
+import HabitatContentStats from '~/components/Habitats/HabitatRow/HabitatContentStats';
 
 import Styles from '~/constants/styles';
 import habitats from '~/constants/habitats';
@@ -20,7 +16,6 @@ function HabitatEvolveStats({
   habitat: HabitatTypes,
   basis: HabitatBasis,
 }) {
-  const { rate } = habitats.Metadata[habitat];
   const meta = habitats.getMetadata(habitat, basis);
 
   const newGoldValue = basis.gold * basis.multiplier;
@@ -31,24 +26,27 @@ function HabitatEvolveStats({
   const goldInc = scales.numberToShortString(newGoldValue - basis.gold);
 
   return (
-    <>
-      <HabitatContentRow>
-        <HabitatRate>
+    <HabitatContentStats
+      habitat={habitat}
+      gold={
+        <>
           <span>{`${newGold} `}</span>
           <RateMath>{`(${oldGold} + ${goldInc})`}</RateMath>
-          <span>{` / ${rate}Sec`}</span>
-        </HabitatRate>
-        <HabitatGoldPerSecond>
+        </>
+      }
+      goldPerSecond={
+        <>
           <span>{`${scales.numberToShortString(newGoldPerSecondValue)} `}</span>
           <RateMath>{`(${scales.numberToShortString(
             meta.goldPerSecond
           )} + ${scales.numberToShortString(
             newGoldPerSecondValue - meta.goldPerSecond
           )})`}</RateMath>
-          <span>{` / Sec`}</span>
-        </HabitatGoldPerSecond>
-      </HabitatContentRow>
-    </>
+        </>
+      }
+      hearts={scales.numberToShortString(basis.hearts)}
+      multiplier={`${basis.multiplier * 100}%`}
+    />
   );
 }
 

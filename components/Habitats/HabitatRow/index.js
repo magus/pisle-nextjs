@@ -83,6 +83,7 @@ export const HabitatContentRowSpacer = styled.div`
 `;
 
 export const HabitatRate = styled.div`
+  margin: 0 0 ${Styles.Spacing.Smaller}px 0;
   font-size: ${Styles.Fonts.Small}px;
   font-weight: ${Styles.Fonts.Weight.Heavy};
   color: ${Styles.Colors.Gold};
@@ -98,7 +99,7 @@ export const HabitatLabeledValue = ({
   value,
   label,
 }: {
-  value: string,
+  value: ?(string | React.Node),
   label: string,
 }) => {
   return (
@@ -110,7 +111,7 @@ export const HabitatLabeledValue = ({
 };
 
 const HabitatLabeledValueContainer = styled.div`
-  margin: ${Styles.Spacing.Smaller}px 0 0 0;
+  margin: ${Styles.Spacing.Smaller}px ${Styles.Spacing.Smaller}px 0 0;
   font-size: ${Styles.Fonts.Smaller}px;
   font-weight: ${Styles.Fonts.Weight.Normal};
   display: flex;
@@ -121,10 +122,11 @@ const HabitatLabeledValueContainer = styled.div`
 const HabitatLabeledValueLabel = styled.div`
   color: ${Styles.Colors.Red};
   font-weight: ${Styles.Fonts.Weight.Heavy};
+  line-height: ${Styles.Fonts.Medium}px;
 `;
 
 const HabitatLabeledValueValue = styled.div`
   padding: 0 0 0 ${Styles.Spacing.Small}px;
-  color: ${Styles.Colors.GrayDarker};
+  color: ${Styles.Colors.Black};
   font-size: ${Styles.Fonts.Medium}px;
 `;

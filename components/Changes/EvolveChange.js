@@ -36,14 +36,13 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
   }
 
   render() {
-    const { onDone, onCancel } = this.props;
     const { habitat } = this.state;
     const { valid, hearts, multiplier } = this._getInputs();
 
     if (habitat) {
       const onClick =
         valid && hearts && multiplier
-          ? onDone({
+          ? this.props.onDone({
               habitat,
               hearts,
               multiplier,
@@ -57,7 +56,7 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
           <button disabled={!valid} onClick={onClick}>
             Done
           </button>
-          <button onClick={onCancel}>Cancel</button>
+          {this._renderCancel()}
         </>
       );
     }
@@ -66,8 +65,13 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
       <>
         {this._renderInstructions()}
         {this._renderChange()}
+        {this._renderCancel()}
       </>
     );
+  }
+
+  _renderCancel() {
+    return <button onClick={this.props.onCancel}>Cancel</button>;
   }
 
   _renderInputs() {
