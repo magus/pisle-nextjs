@@ -201,7 +201,9 @@ export default class Habitats extends React.Component<Props, State> {
             {"Welcome, you look new here. Let's get you setup!"}
           </Instructions>
           {this._renderInitBasis()}
-          {this._renderReset()}
+          <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
+            Reset
+          </button>
           {this._renderSave()}
         </>
       );
@@ -238,10 +240,7 @@ export default class Habitats extends React.Component<Props, State> {
 
         <button onClick={() => this.setState(suggestEvolve())}>Evolve</button>
 
-        <div>Penguins</div>
-        <button onClick={() => this.setState(addPenguin())}>+</button>
-
-        <button onClick={() => this.setState(startEdit())}>Edit</button>
+        <button onClick={() => this.setState(addPenguin())}>Add Penguin</button>
 
         {habitats.All.map<null | React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];
@@ -262,16 +261,8 @@ export default class Habitats extends React.Component<Props, State> {
           return null;
         })}
 
-        {this._renderReset()}
+        <button onClick={() => this.setState(startEdit())}>Edit</button>
       </>
-    );
-  }
-
-  _renderReset() {
-    return (
-      <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
-        Reset
-      </button>
     );
   }
 
