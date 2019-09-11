@@ -65,4 +65,5 @@ export default class Page extends React.Component<Props> {
 
 const Container = styled.div`
   color: ${Styles.Colors.Black};
+  margin: 50px 0;
 `;
