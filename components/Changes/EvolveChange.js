@@ -5,12 +5,14 @@ import * as React from 'react';
 import type { Props as ChangeProps } from '~/components/Changes/UncommittedChange';
 
 import HabitatRow from '~/components/Habitats/HabitatRow';
+import HabitatContentStats from '~/components/Habitats/HabitatRow/HabitatContentStats';
 import HabitatEvolveStats from '~/components/Habitats/HabitatRow/HabitatEvolveStats';
 import Input from '~/components/common/Input';
 import { Instructions } from '~/components/common/Styled';
 
 import spendHearts from '~/src/algorithms/spendHearts';
 import habitats from '~/constants/habitats';
+import scales from '~/constants/scales';
 
 type State = {
   habitat: ?HabitatTypes,
@@ -75,25 +77,35 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
   }
 
   _renderInputs() {
-    const { hearts, multiplier } = this.state;
+    const { habitat, hearts, multiplier } = this.state;
+    const basis = this.props.change.meta[habitat];
 
     return (
       <>
-        <Input
-          label="❤️"
-          type="cost"
-          onChange={hearts => this.setState({ hearts })}
-          placeholderType="cost"
-          validate={value => !!habitats.ValidateField.hearts(value)}
-          value={hearts}
-        />
-        <Input
-          label="Multipler"
-          onChange={multiplier => this.setState({ multiplier })}
-          placeholderType="multiplier"
-          validate={value => !!habitats.ValidateField.multiplier(value)}
-          value={multiplier}
-        />
+        <HabitatRow key={habitat} habitat={habitat}>
+          <HabitatContentStats
+            habitat={habitat}
+            gold={scales.numberToShortString(basis.gold * basis.multiplier)}
+            level={basis.level}
+            cost={scales.numberToShortString(basis.cost)}
+            hearts={
+              <Input
+                onChange={hearts => this.setState({ hearts })}
+                placeholderType="hearts"
+                validate={value => !!habitats.ValidateField.hearts(value)}
+                value={hearts}
+              />
+            }
+            multiplier={
+              <Input
+                onChange={multiplier => this.setState({ multiplier })}
+                placeholderType="multiplier"
+                validate={value => !!habitats.ValidateField.multiplier(value)}
+                value={multiplier}
+              />
+            }
+          />
+        </HabitatRow>
       </>
     );
   }

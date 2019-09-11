@@ -27,16 +27,27 @@ type Props = {
 function HabitatContentStats({ habitat, basis, ...props }: Props) {
   const { rate } = habitats.Metadata[habitat];
 
-  const gold = basis ? scales.numberToShortString(basis.gold) : props.gold;
-  const level = basis ? `${basis.level}` : props.level;
-  const cost = basis ? scales.numberToShortString(basis.cost) : props.cost;
-  const hearts = basis
-    ? scales.numberToShortString(basis.hearts)
-    : props.hearts;
-  const multiplier = basis ? `${basis.multiplier * 100}%` : props.multiplier;
+  const gold =
+    props.gold !== undefined
+      ? props.gold
+      : basis && scales.numberToShortString(basis.gold);
+  const level =
+    props.level !== undefined ? props.level : basis && `${basis.level}`;
+  const cost =
+    props.cost !== undefined
+      ? props.cost
+      : basis && scales.numberToShortString(basis.cost);
+  const hearts =
+    props.hearts !== undefined
+      ? props.hearts
+      : basis && scales.numberToShortString(basis.hearts);
+  const multiplier =
+    props.multiplier !== undefined
+      ? props.multiplier
+      : basis && `${basis.multiplier * 100}%`;
 
   let goldPerSecond = props.goldPerSecond;
-  if (basis) {
+  if (basis && goldPerSecond === undefined) {
     const meta = habitats.getMetadata(habitat, basis);
     goldPerSecond = scales.numberToShortString(meta.goldPerSecond);
   }
@@ -47,17 +58,21 @@ function HabitatContentStats({ habitat, basis, ...props }: Props) {
         <HabitatRate>
           <span>
             <span>{gold}</span>
-            <span>{` / ${rate}Sec`}</span>
+            {gold === undefined ? null : <span>{` / ${rate}Sec`}</span>}
           </span>
         </HabitatRate>
         <HabitatGoldPerSecond>
           <span>{goldPerSecond}</span>
-          <span>{` / Sec`}</span>
+          {goldPerSecond === undefined ? null : <span>{` / Sec`}</span>}
         </HabitatGoldPerSecond>
       </HabitatContentRow>
       <HabitatContentRow>
-        {!level ? null : <HabitatLabeledValue label="LV" value={level} />}
-        {!cost ? null : <HabitatLabeledValue label="Cost" value={cost} />}
+        {level === undefined ? null : (
+          <HabitatLabeledValue label="LV" value={level} />
+        )}
+        {cost === undefined ? null : (
+          <HabitatLabeledValue label="Cost" value={cost} />
+        )}
         <FlexRow>
           <HabitatLabeledValue label="❤️" value={hearts} />
           <HabitatLabeledValue label="⬆️" value={multiplier} />
