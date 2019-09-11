@@ -246,7 +246,6 @@ export default class Habitats extends React.Component<Props, State> {
         <button onClick={() => this.setState(suggestEvolve())}>Evolve</button>
 
         <div>Penguins</div>
-        <div>{penguins}</div>
         <button onClick={() => this.setState(addPenguin())}>+</button>
 
         <button onClick={() => this.setState(startEdit())}>Edit</button>
