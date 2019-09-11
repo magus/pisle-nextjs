@@ -12,21 +12,19 @@ const PlaceholderTypes = {
   multiplier: '300%',
 };
 
-type InputProps = {
+type Props = {|
   color?: string,
-  label?: string,
   onChange: (value: string) => void,
   placeholderType?: $Keys<typeof PlaceholderTypes>,
   placeholder?: String,
   validate: (value: string) => boolean,
   value: string,
-};
+|};
 
-export default class Input extends React.Component<InputProps> {
+export default class Input extends React.Component<Props> {
   render() {
     const {
       color,
-      label,
       validate,
       value,
       onChange,
@@ -40,27 +38,33 @@ export default class Input extends React.Component<InputProps> {
       '';
 
     return (
-      <label>
-        <InputLabel>{label}</InputLabel>
-        <StyledInput
-          color={color}
-          invalid={value && !validate(value)}
-          onChange={event => onChange(event.target.value)}
-          value={value}
-          placeholder={placeholderText}
-        />
-      </label>
+      <StyledInput
+        color={color}
+        invalid={value && !validate(value)}
+        onChange={event => onChange(event.target.value)}
+        value={value}
+        placeholder={placeholderText}
+      />
     );
   }
 }
 
-const StyledInput = styled.input`
-  color: ${props => props.color || 'inherit'};
-  width: 100%;
-  border: 1px solid
-    ${props => (props.invalid ? Styles.Colors.Orange : Styles.Colors.Gray)};
+export function InlineInput(props: Props) {
+  return (
+    <InlineInputContainer>
+      <Input {...props} />
+    </InlineInputContainer>
+  );
+}
+
+const InlineInputContainer = styled.div`
+  width: 75px;
+  display: inline-block;
 `;
 
-const InputLabel = styled.span`
-  margin: 0 ${Styles.Spacing.Small}px 0 0;
+const StyledInput = styled.input`
+  color: ${props => props.color || 'inherit'};
+  width: inherit;
+  border: 1px solid
+    ${props => (props.invalid ? Styles.Colors.Orange : Styles.Colors.Gray)};
 `;

@@ -3,12 +3,11 @@
 import type { Change } from '~/components/Changes';
 
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { ChangeTypes } from '~/components/Changes';
 import HabitatRow from '~/components/Habitats/HabitatRow';
 import HabitatContentStats from '~/components/Habitats/HabitatRow/HabitatContentStats';
-import Input from '~/components/common/Input';
+import { InlineInput } from '~/components/common/Input';
 import { Instructions } from '~/components/common/Styled';
 import UncommittedChange from '~/components/Changes/UncommittedChange';
 
@@ -225,8 +224,8 @@ export default class Habitats extends React.Component<Props, State> {
     const upgradeBudgetValue = habitats.ValidateField.cost(upgradeBudgetInput);
     return (
       <>
-        <Input
-          label="Budget"
+        <div>Budget</div>
+        <InlineInput
           onChange={upgradeBudget => this.setState({ upgradeBudget })}
           placeholderType="cost"
           validate={value => !!habitats.ValidateField.cost(value)}
@@ -336,19 +335,6 @@ export default class Habitats extends React.Component<Props, State> {
     });
   };
 }
-
-function InlineInput(props) {
-  return (
-    <InlineInputContainer>
-      <Input {...props} />
-    </InlineInputContainer>
-  );
-}
-
-const InlineInputContainer = styled.div`
-  width: 75px;
-  display: inline-block;
-`;
 
 const HabitatBasisFieldPlaceholderTypes = {
   [habitats.HabitatFields.level]: 'numeric',

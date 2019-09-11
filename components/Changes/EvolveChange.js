@@ -7,7 +7,7 @@ import type { Props as ChangeProps } from '~/components/Changes/UncommittedChang
 import HabitatRow from '~/components/Habitats/HabitatRow';
 import HabitatContentStats from '~/components/Habitats/HabitatRow/HabitatContentStats';
 import HabitatEvolveStats from '~/components/Habitats/HabitatRow/HabitatEvolveStats';
-import Input from '~/components/common/Input';
+import { InlineInput } from '~/components/common/Input';
 import { Instructions } from '~/components/common/Styled';
 
 import spendHearts from '~/src/algorithms/spendHearts';
@@ -80,6 +80,8 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
     const { habitat, hearts, multiplier } = this.state;
     const basis = this.props.change.meta[habitat];
 
+    if (!habitat) return null;
+
     return (
       <>
         <HabitatRow key={habitat} habitat={habitat}>
@@ -89,7 +91,7 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
             level={basis.level}
             cost={scales.numberToShortString(basis.cost)}
             hearts={
-              <Input
+              <InlineInput
                 onChange={hearts => this.setState({ hearts })}
                 placeholderType="hearts"
                 validate={value => !!habitats.ValidateField.hearts(value)}
@@ -97,7 +99,7 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
               />
             }
             multiplier={
-              <Input
+              <InlineInput
                 onChange={multiplier => this.setState({ multiplier })}
                 placeholderType="multiplier"
                 validate={value => !!habitats.ValidateField.multiplier(value)}
