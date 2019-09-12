@@ -221,9 +221,9 @@ export default class Habitats extends React.Component<Props, State> {
             {"Welcome, you look new here. Let's get you setup!"}
           </Instructions>
           {this._renderInitBasis()}
-          <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
+          {/* <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
             Reset
-          </button>
+          </button> */}
           {this._renderSave()}
         </>
       );
