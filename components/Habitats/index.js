@@ -11,6 +11,12 @@ import { InlineInput } from '~/components/common/Input';
 import { Instructions } from '~/components/common/Styled';
 import UncommittedChange from '~/components/Changes/UncommittedChange';
 
+import {
+  exportStateLocalStorage,
+  exportStateUrl,
+  importLocalStorage,
+  importStateUrl,
+} from '~/src/exportState';
 import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
@@ -30,6 +36,7 @@ type InitBasisCollection = {
 };
 
 type State = {|
+  date: number,
   initBasis: InitBasisCollection,
   basis: ?HabitatBasisCollection,
   uncommittedChange: ?Change,
@@ -46,7 +53,7 @@ const addPenguin = () => state => {
     basis[habitat].gold = basis[habitat].gold * game.PenguinIncreaseFactor;
   });
 
-  return { basis, uncommittedChange: null };
+  return { date: Date.now(), basis, uncommittedChange: null };
 };
 
 const suggestUpgrades = budget => state => {
@@ -99,7 +106,7 @@ const commitChange = change => state => {
   }
 
   // clear uncommitted change
-  return { basis, uncommittedChange: null };
+  return { date: Date.now(), basis, uncommittedChange: null };
 };
 
 const setInitBasis = (habitat, updateBlob) => state => {
@@ -108,9 +115,7 @@ const setInitBasis = (habitat, updateBlob) => state => {
   return { initBasis };
 };
 
-const startEdit = () => state => {
-  const { basis } = state;
-  if (!basis) return;
+function basisToInitBasis(basis: HabitatBasisCollection) {
   const initBasis: InitBasisCollection = {};
   Object.keys(basis).forEach(habitat => {
     const basisHabitat = basis[habitat];
@@ -123,16 +128,28 @@ const startEdit = () => state => {
     };
   });
 
+  return initBasis;
+}
+
+const startEdit = () => state => {
+  const { basis } = state;
+  if (!basis) return;
+  const initBasis = basisToInitBasis(basis);
   return { basis: null, initBasis };
 };
 
-const LocalStorageKey = 'pisle-nextjs';
+const saveBasis = (basis: HabitatBasisCollection) => () => ({
+  date: Date.now(),
+  initBasis: {},
+  basis,
+});
 
 export default class Habitats extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
     this.state = {
+      date: -1,
       initBasis: {},
       basis: null,
       uncommittedChange: null,
@@ -141,32 +158,35 @@ export default class Habitats extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (window && window.localStorage) {
-      const storedState = JSON.parse(
-        window.localStorage.getItem(LocalStorageKey)
-      );
+    const localStorageState = importLocalStorage();
+    const queryParamState = importStateUrl();
 
-      if (storedState) {
-        const state = {};
-
-        if (storedState.basis) {
-          state.basis = storedState.basis;
-        }
-        if (storedState.initBasis) {
-          state.initBasis = storedState.initBasis;
-        }
-        if (storedState.upgradeBudget) {
-          state.upgradeBudget = storedState.upgradeBudget;
-        }
-
-        this.setState(state);
+    // select state with most recent date
+    let storedState;
+    if (localStorageState && queryParamState) {
+      console.info('loading', 'local storage and query param both available');
+      if (localStorageState.date > queryParamState.date) {
+        console.info('loading from', 'local storage');
+        storedState = localStorageState;
+      } else {
+        console.info('loading from', 'query param');
+        storedState = queryParamState;
       }
+    } else if (localStorageState) {
+      console.info('loading from', 'local storage');
+      storedState = localStorageState;
+    } else if (queryParamState) {
+      console.info('loading from', 'query param');
+      storedState = queryParamState;
+    }
+
+    if (storedState) {
+      this.setState({ ...storedState });
     }
   }
 
   componentDidUpdate() {
-    console.info('localStorage', 'write', { ...this.state });
-    localStorage.setItem(LocalStorageKey, JSON.stringify(this.state));
+    exportStateLocalStorage({ ...this.state });
   }
 
   _getInputs() {
@@ -262,6 +282,14 @@ export default class Habitats extends React.Component<Props, State> {
         })}
 
         <button onClick={() => this.setState(startEdit())}>Edit</button>
+        <button
+          onClick={() => {
+            exportStateUrl({ ...this.state });
+            alert('Saved to URL, share the link!');
+          }}
+        >
+          Export
+        </button>
       </>
     );
   }
@@ -270,10 +298,7 @@ export default class Habitats extends React.Component<Props, State> {
     const basis = this._getInputs();
 
     return (
-      <button
-        disabled={!basis}
-        onClick={() => this.setState({ initBasis: {}, basis })}
-      >
+      <button disabled={!basis} onClick={() => this.setState(saveBasis(basis))}>
         Save
       </button>
     );
