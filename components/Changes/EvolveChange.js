@@ -4,7 +4,9 @@ import * as React from 'react';
 
 import type { Props as ChangeProps } from '~/components/Changes/UncommittedChange';
 
-import HabitatRow from '~/components/Habitats/HabitatRow';
+import HabitatRow, {
+  HabitatLabeledValue,
+} from '~/components/Habitats/HabitatRow';
 import HabitatContentStats from '~/components/Habitats/HabitatRow/HabitatContentStats';
 import HabitatEvolveStats from '~/components/Habitats/HabitatRow/HabitatEvolveStats';
 import { InlineInput } from '~/components/common/Input';
@@ -134,10 +136,14 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
 
     const spendHeartMeta = spendHearts(change.meta);
 
+    const bestGoldPerSecondPerHeart = spendHeartMeta[0].goldPerSecondPerHeart;
+
     // sort by spendHeart algorithm
     return spendHeartMeta.map<React$Element<typeof HabitatRow>>(
       habitatBasis => {
         const habitat = habitatBasis.habitat;
+        const efficiency =
+          habitatBasis.goldPerSecondPerHeart / bestGoldPerSecondPerHeart;
 
         return (
           <HabitatRow
@@ -148,6 +154,10 @@ export default class EvolveChange extends React.Component<ChangeProps, State> {
             <HabitatEvolveStats
               habitat={habitat}
               basis={change.meta[habitat]}
+            />
+            <HabitatLabeledValue
+              label="Efficiency"
+              value={efficiency.toFixed(4)}
             />
           </HabitatRow>
         );
