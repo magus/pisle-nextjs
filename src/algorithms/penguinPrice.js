@@ -4,7 +4,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 
 import game from '~/constants/game';
 import habitats from '~/constants/habitats';
-import scales from '~/constants/scales';
+// import scales from '~/constants/scales';
 
 export default function penguinPrice(initBasis: HabitatBasisCollection) {
   let basis = _cloneDeep(initBasis);
@@ -32,9 +32,9 @@ export default function penguinPrice(initBasis: HabitatBasisCollection) {
 
   const foundBest = allHabitatsMeta[0];
 
-  const penguinPrice =
-    (totalGoldPerSecond * 1.5 - totalGoldPerSecond) /
-    foundBest.goldPerSecondPerCost;
+  const penguinGain =
+    totalGoldPerSecond * game.PenguinIncreaseFactor - totalGoldPerSecond;
+  const penguinPrice = penguinGain / foundBest.goldPerSecondPerCost;
 
   // // debug
   // console.info(
