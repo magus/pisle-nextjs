@@ -17,6 +17,7 @@ import {
   importLocalStorage,
   importStateUrl,
 } from '~/src/exportState';
+import penguinPrice from '~/src/algorithms/penguinPrice';
 import spendGold from '~/src/algorithms/spendGold';
 
 import game from '~/constants/game';
@@ -260,6 +261,10 @@ export default class Habitats extends React.Component<Props, State> {
 
         <button onClick={() => this.setState(suggestEvolve())}>Evolve</button>
 
+        <div>
+          Penguin Max Price{' '}
+          <span>{scales.numberToShortString(penguinPrice(basis))}</span>
+        </div>
         <button onClick={() => this.setState(addPenguin())}>Add Penguin</button>
 
         {habitats.All.map<null | React$Element<typeof HabitatRow>>(habitat => {
