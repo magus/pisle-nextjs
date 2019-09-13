@@ -21,17 +21,13 @@ export default function UncommittedChange({ change, onCancel, onDone }: Props) {
 
   switch (change.type) {
     case ChangeTypes.Upgrade: {
-      const habitatDeltas = Object.keys(change.meta.final)
-        .map(habitat => {
-          const oldLevel = change.meta.original[habitat].level;
-          const newLevel = change.meta.final[habitat].level;
-          const levelDelta = newLevel - oldLevel;
+      const habitatDeltas = Object.keys(change.meta.final).map(habitat => {
+        const oldLevel = change.meta.original[habitat].level;
+        const newLevel = change.meta.final[habitat].level;
+        const levelDelta = newLevel - oldLevel;
 
-          if (levelDelta === 0) return null;
-
-          return { habitat, oldLevel, newLevel, levelDelta };
-        })
-        .filter(v => v);
+        return { habitat, oldLevel, newLevel, levelDelta };
+      });
 
       if (!habitatDeltas.length) {
         return (
