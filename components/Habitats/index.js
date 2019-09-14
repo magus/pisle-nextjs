@@ -410,5 +410,8 @@ const HabitatBasisFieldPlaceholderTypes = {
 };
 
 const Container = styled.div`
-  margin: ${Styles.Spacing.Large}px ${Styles.Spacing.Large}px 100px;
+  max-width: 640px;
+
+  margin: ${Styles.Spacing.Large}px auto 100px;
+  padding: 0 ${Styles.Spacing.Large}px;
 `;
