@@ -38,7 +38,7 @@ const HabitatContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  margin: ${Styles.Spacing.Large}px;
+  margin: ${Styles.Spacing.Large}px 0;
   padding: 16px;
   border-radius: ${Styles.Radius.Normal}px;
   box-shadow: 0px 0px ${Styles.Radius.Normal}px 0px ${Styles.Colors.Shadow};

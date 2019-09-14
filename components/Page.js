@@ -1,11 +1,8 @@
 // @flow
 import React from 'react';
-import styled from 'styled-components';
 
 import StyleReset from '~/components/StyleReset';
 import GlobalStyles from '~/components/GlobalStyles';
-
-import Styles from '~/constants/styles';
 
 function preventPullToRefresh(element) {
   if (!element) return;
@@ -52,18 +49,13 @@ export default class Page extends React.Component<Props> {
 
   render() {
     return (
-      <Container ref={this.containerRef}>
+      <div ref={this.containerRef}>
         {/* Global Styles */}
         <StyleReset />
         <GlobalStyles />
 
         {this.props.children}
-      </Container>
+      </div>
     );
   }
 }
-
-const Container = styled.div`
-  color: ${Styles.Colors.Black};
-  margin: 50px 0;
-`;

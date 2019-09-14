@@ -3,12 +3,14 @@
 import type { Change } from '~/components/Changes';
 
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { ChangeTypes } from '~/components/Changes';
 import HabitatRow from '~/components/Habitats/HabitatRow';
 import HabitatContentStats from '~/components/Habitats/HabitatRow/HabitatContentStats';
 import { InlineInput } from '~/components/common/Input';
 import { Instructions } from '~/components/common/Styled';
+import Styles from '~/constants/styles';
 import UncommittedChange from '~/components/Changes/UncommittedChange';
 
 import {
@@ -269,7 +271,7 @@ export default class Habitats extends React.Component<Props, State> {
     const upgradeBudgetInput = this.state.upgradeBudget;
     const upgradeBudgetValue = habitats.ValidateField.cost(upgradeBudgetInput);
     return (
-      <>
+      <Container>
         <div>Budget</div>
         <InlineInput
           onChange={upgradeBudget => this.setState({ upgradeBudget })}
@@ -328,7 +330,7 @@ export default class Habitats extends React.Component<Props, State> {
         >
           Export
         </button>
-      </>
+      </Container>
     );
   }
 
@@ -406,3 +408,7 @@ const HabitatBasisFieldPlaceholderTypes = {
   [habitats.HabitatFields.hearts]: 'hearts',
   [habitats.HabitatFields.multiplier]: 'multiplier',
 };
+
+const Container = styled.div`
+  margin: ${Styles.Spacing.Large}px ${Styles.Spacing.Large}px 100px;
+`;
