@@ -217,6 +217,10 @@ export default class Habitats extends React.Component<Props, State> {
     exportStateLocalStorage({ ...this.state });
   }
 
+  render() {
+    return <Container>{this._renderState()}</Container>;
+  }
+
   _getInputs() {
     const basis = {};
     let valid = true;
@@ -239,7 +243,7 @@ export default class Habitats extends React.Component<Props, State> {
     return valid && basis;
   }
 
-  render() {
+  _renderState() {
     const { basis, uncommittedChange } = this.state;
 
     if (!basis) {
@@ -271,7 +275,7 @@ export default class Habitats extends React.Component<Props, State> {
     const upgradeBudgetInput = this.state.upgradeBudget;
     const upgradeBudgetValue = habitats.ValidateField.cost(upgradeBudgetInput);
     return (
-      <Container>
+      <>
         <div>Budget</div>
         <InlineInput
           onChange={upgradeBudget => this.setState({ upgradeBudget })}
@@ -330,7 +334,7 @@ export default class Habitats extends React.Component<Props, State> {
         >
           Export
         </button>
-      </Container>
+      </>
     );
   }
 
