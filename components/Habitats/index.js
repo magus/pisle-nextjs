@@ -40,6 +40,7 @@ type InitBasisCollection = {
 
 type State = {|
   date: number,
+  confirmReset: boolean,
   initBasis: InitBasisCollection,
   basis: ?HabitatBasisCollection,
   uncommittedChange: ?Change,
@@ -198,6 +199,15 @@ const saveBasis = (basis: HabitatBasisCollection) => () => ({
   basis,
 });
 
+const INIT_STATE = {
+  date: -1,
+  confirmReset: false,
+  initBasis: {},
+  basis: null,
+  uncommittedChange: null,
+  upgradeBudget: '',
+};
+
 export default class Habitats extends React.Component<Props, State> {
   _refs = {
     adjustGold: React.createRef(),
@@ -207,13 +217,7 @@ export default class Habitats extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {
-      date: -1,
-      initBasis: {},
-      basis: null,
-      uncommittedChange: null,
-      upgradeBudget: '',
-    };
+    this.state = { ...INIT_STATE };
   }
 
   componentDidMount() {
@@ -274,6 +278,26 @@ export default class Habitats extends React.Component<Props, State> {
     return valid && basis;
   }
 
+  _renderReset() {
+    const { confirmReset } = this.state;
+
+    return (
+      <ResetContainer>
+        {confirmReset ? null : (
+          <button onClick={() => this.setState({ confirmReset: true })}>
+            Reset?
+          </button>
+        )}
+
+        {!confirmReset ? null : (
+          <button onClick={() => this.setState({ ...INIT_STATE })}>
+            RESET
+          </button>
+        )}
+      </ResetContainer>
+    );
+  }
+
   _renderState() {
     const { basis, uncommittedChange } = this.state;
 
@@ -284,10 +308,8 @@ export default class Habitats extends React.Component<Props, State> {
             {"Welcome, you look new here. Let's get you setup!"}
           </Instructions>
           {this._renderInitBasis()}
-          <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
-            Reset
-          </button>
           {this._renderSave()}
+          {this._renderReset()}
         </>
       );
     }
@@ -476,4 +498,8 @@ const Container = styled.div`
 
   margin: ${Styles.Spacing.Large}px auto 100px;
   padding: 0 ${Styles.Spacing.Large}px;
+`;
+
+const ResetContainer = styled.div`
+  margin: 50px 0;
 `;
