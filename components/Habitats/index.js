@@ -84,6 +84,32 @@ const addGoldResearch = () => state => {
   });
 };
 
+function multiplierStringToNumber(multiplierString: string) {
+  const factorInt = parseInt(multiplierString, 10);
+  if (isNaN(factorInt)) return;
+  const multiplier = factorInt / 100;
+  console.info({ multiplier });
+  return multiplier;
+}
+
+const customGoldAdjust = (goldFactor: string) => state => {
+  const multiplier = multiplierStringToNumber(goldFactor);
+  if (!multiplier) return;
+  return forEachHabitat(state.basis, habitat => {
+    habitat.gold = habitat.gold * multiplier;
+    return habitat;
+  });
+};
+
+const customCostAdjust = (costFactor: string) => state => {
+  const multiplier = multiplierStringToNumber(costFactor);
+  if (!multiplier) return;
+  return forEachHabitat(state.basis, habitat => {
+    habitat.gold = habitat.gold * multiplier;
+    return habitat;
+  });
+};
+
 const suggestUpgrades = budget => state => {
   if (!state.basis || !budget) return;
 
@@ -173,6 +199,11 @@ const saveBasis = (basis: HabitatBasisCollection) => () => ({
 });
 
 export default class Habitats extends React.Component<Props, State> {
+  _refs = {
+    adjustGold: React.createRef(),
+    adjustCost: React.createRef(),
+  };
+
   constructor(props: Props) {
     super(props);
 
@@ -253,9 +284,9 @@ export default class Habitats extends React.Component<Props, State> {
             {"Welcome, you look new here. Let's get you setup!"}
           </Instructions>
           {this._renderInitBasis()}
-          {/* <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
+          <button onClick={() => this.setState({ initBasis: {}, basis: null })}>
             Reset
-          </button> */}
+          </button>
           {this._renderSave()}
         </>
       );
@@ -305,6 +336,33 @@ export default class Habitats extends React.Component<Props, State> {
         <button onClick={() => this.setState(addCostResearch())}>
           Cost Decrease
         </button>
+
+        <div>Custom</div>
+        <div>
+          <input ref={this._refs.adjustGold} placeholder="120%" />
+          <button
+            onClick={() =>
+              this.setState(
+                customGoldAdjust(this._refs.adjustGold.current.value)
+              )
+            }
+          >
+            Adjust Gold
+          </button>
+        </div>
+
+        <div>
+          <input ref={this._refs.adjustCost} placeholder="120%" />
+          <button
+            onClick={() =>
+              this.setState(
+                customCostAdjust(this._refs.adjustCost.current.value)
+              )
+            }
+          >
+            Adjust Cost
+          </button>
+        </div>
 
         {habitats.All.map<null | React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];
