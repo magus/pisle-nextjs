@@ -44,17 +44,42 @@ type State = {|
   upgradeBudget: string,
 |};
 
-const addPenguin = () => state => {
-  const { basis } = state;
+function forEachHabitat(
+  basis: ?HabitatBasisCollection,
+  callback: (habitat: HabitatBasis) => HabitatBasis
+) {
+  const newBasis = { ...basis };
 
   if (!basis) return;
 
   // update all gold values for habitat basis
   Object.keys(basis).forEach(habitat => {
-    basis[habitat].gold = basis[habitat].gold * game.PenguinIncreaseFactor;
+    newBasis[habitat] = callback({ ...basis[habitat] });
   });
 
-  return { date: Date.now(), basis, uncommittedChange: null };
+  return { date: Date.now(), basis: newBasis, uncommittedChange: null };
+}
+
+const addPenguin = () => state => {
+  // update all gold values for habitat basis
+  return forEachHabitat(state.basis, habitat => {
+    habitat.gold = habitat.gold * game.PenguinIncreaseFactor;
+    return habitat;
+  });
+};
+
+const addCostResearch = () => state => {
+  return forEachHabitat(state.basis, habitat => {
+    habitat.cost = habitat.cost * game.ResearchFactors.Cost;
+    return habitat;
+  });
+};
+
+const addGoldResearch = () => state => {
+  return forEachHabitat(state.basis, habitat => {
+    habitat.gold = habitat.gold * game.ResearchFactors.Gold;
+    return habitat;
+  });
 };
 
 const suggestUpgrades = budget => state => {
@@ -266,6 +291,14 @@ export default class Habitats extends React.Component<Props, State> {
           <span>{scales.numberToShortString(penguinPrice(basis))}</span>
         </div>
         <button onClick={() => this.setState(addPenguin())}>Add Penguin</button>
+
+        <div>Research</div>
+        <button onClick={() => this.setState(addGoldResearch())}>
+          Production Increase
+        </button>
+        <button onClick={() => this.setState(addCostResearch())}>
+          Cost Decrease
+        </button>
 
         {habitats.All.map<null | React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];
