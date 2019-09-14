@@ -13,6 +13,8 @@ const Habitats = {
   IglooCamp: 'IglooCamp',
   SculpturePark: 'SculpturePark',
   DolphinFarm: 'DolphinFarm',
+  AlbatrossNest: 'AlbatrossNest',
+  Lighthouse: 'Lighthouse',
 };
 
 const All: HabitatTypes[] = Object.keys(Habitats);
@@ -94,7 +96,15 @@ const Metadata: {
   },
   [Habitats.DolphinFarm]: {
     name: 'Dolphin Farm',
-    rate: 10,
+    rate: 15,
+  },
+  [Habitats.AlbatrossNest]: {
+    name: 'Albatross Nest',
+    rate: 15,
+  },
+  [Habitats.Lighthouse]: {
+    name: 'Lighthouse',
+    rate: 15,
   },
 };
 
