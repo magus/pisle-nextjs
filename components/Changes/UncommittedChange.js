@@ -9,6 +9,7 @@ import EvolveChange from '~/components/Changes/EvolveChange';
 import HabitatRow from '~/components/Habitats/HabitatRow';
 import HabitatUpgradeStats from '~/components/Habitats/HabitatRow/HabitatUpgradeStats';
 import { Instructions } from '~/components/common/Styled';
+import Research from '~/components/Changes/Research';
 
 export type Props = {|
   onCancel: () => void,
@@ -69,6 +70,10 @@ export default function UncommittedChange({ change, onCancel, onDone }: Props) {
       return (
         <EvolveChange change={change} onDone={onDone} onCancel={onCancel} />
       );
+    }
+    case ChangeTypes.Research: {
+      console.info('Research', ChangeTypes.Research, change);
+      return <Research change={change} onDone={onDone} onCancel={onCancel} />;
     }
     default:
       console.error('DisplayUncommittedChange', change);

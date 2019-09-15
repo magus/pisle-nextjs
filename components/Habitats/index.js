@@ -71,46 +71,6 @@ const addPenguin = () => state => {
   });
 };
 
-const addCostResearch = () => state => {
-  return forEachHabitat(state.basis, habitat => {
-    habitat.cost = habitat.cost * game.ResearchFactors.Cost;
-    return habitat;
-  });
-};
-
-const addGoldResearch = () => state => {
-  return forEachHabitat(state.basis, habitat => {
-    habitat.gold = habitat.gold * game.ResearchFactors.Gold;
-    return habitat;
-  });
-};
-
-function multiplierStringToNumber(multiplierString: string) {
-  const factorInt = parseInt(multiplierString, 10);
-  if (isNaN(factorInt)) return;
-  const multiplier = factorInt / 100;
-  console.info({ multiplier });
-  return multiplier;
-}
-
-const customGoldAdjust = (goldFactor: string) => state => {
-  const multiplier = multiplierStringToNumber(goldFactor);
-  if (!multiplier) return;
-  return forEachHabitat(state.basis, habitat => {
-    habitat.gold = habitat.gold * multiplier;
-    return habitat;
-  });
-};
-
-const customCostAdjust = (costFactor: string) => state => {
-  const multiplier = multiplierStringToNumber(costFactor);
-  if (!multiplier) return;
-  return forEachHabitat(state.basis, habitat => {
-    habitat.gold = habitat.gold * multiplier;
-    return habitat;
-  });
-};
-
 const suggestUpgrades = budget => state => {
   if (!state.basis || !budget) return;
 
@@ -122,6 +82,12 @@ const suggestUpgrades = budget => state => {
 const suggestEvolve = () => state => {
   const meta = state.basis;
   const uncommittedChange = { type: ChangeTypes.Evolve, meta };
+  return { uncommittedChange };
+};
+
+const prepareResearch = () => state => {
+  const meta = state.basis;
+  const uncommittedChange = { type: ChangeTypes.Research, meta };
   return { uncommittedChange };
 };
 
@@ -155,6 +121,32 @@ const commitChange = change => state => {
         basis[habitat].multiplier = multiplier;
       }
       break;
+    }
+    case ChangeTypes.Research: {
+      const fishingSpotBasis = basis[habitats.FishingSpot];
+      const { gold, cost } = change.extra;
+      const goldFactor = gold / fishingSpotBasis.gold;
+      const costFactor = cost / fishingSpotBasis.cost;
+
+      console.info('commit', ChangeTypes.Research, change, {
+        goldFactor,
+        costFactor,
+      });
+
+      return forEachHabitat(basis, habitat => {
+        // determine if factor is large enough to warrant updating everything
+        // 0.1 means 10% change (increase or decrease)
+        if (Math.abs(1 - goldFactor) > 0.1) {
+          habitat.gold = habitat.gold * goldFactor;
+          console.info('adjusted gold', habitat, goldFactor, habitat.gold);
+        }
+        if (Math.abs(1 - costFactor) > 0.1) {
+          habitat.cost = habitat.cost * costFactor;
+          console.info('adjusted cost', habitat, costFactor, habitat.cost);
+        }
+
+        return habitat;
+      });
     }
     default:
       console.error('commit', change);
@@ -209,11 +201,6 @@ const INIT_STATE = {
 };
 
 export default class Habitats extends React.Component<Props, State> {
-  _refs = {
-    adjustGold: React.createRef(),
-    adjustCost: React.createRef(),
-  };
-
   constructor(props: Props) {
     super(props);
 
@@ -352,39 +339,9 @@ export default class Habitats extends React.Component<Props, State> {
         <button onClick={() => this.setState(addPenguin())}>Add Penguin</button>
 
         <div>Research</div>
-        <button onClick={() => this.setState(addGoldResearch())}>
-          Production Increase
+        <button onClick={() => this.setState(prepareResearch())}>
+          Research
         </button>
-        <button onClick={() => this.setState(addCostResearch())}>
-          Cost Decrease
-        </button>
-
-        <div>Custom</div>
-        <div>
-          <input ref={this._refs.adjustGold} placeholder="120%" />
-          <button
-            onClick={() =>
-              this.setState(
-                customGoldAdjust(this._refs.adjustGold.current.value)
-              )
-            }
-          >
-            Adjust Gold
-          </button>
-        </div>
-
-        <div>
-          <input ref={this._refs.adjustCost} placeholder="120%" />
-          <button
-            onClick={() =>
-              this.setState(
-                customCostAdjust(this._refs.adjustCost.current.value)
-              )
-            }
-          >
-            Adjust Cost
-          </button>
-        </div>
 
         {habitats.All.map<null | React$Element<typeof HabitatRow>>(habitat => {
           const habitatBasis = basis[habitat];

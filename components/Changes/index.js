@@ -3,6 +3,7 @@
 export const ChangeTypes = {
   Upgrade: 'Upgrade',
   Evolve: 'Evolve',
+  Research: 'Research',
 };
 
 type ChangeType = $Keys<typeof ChangeTypes>;
